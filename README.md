@@ -1,0 +1,132 @@
+# 🧪 PDI Theory Demo
+
+A lightweight computational chemistry playground for developing and validating ORCA–Multiwfn–Python workflows on molecular photocatalysts.
+
+This repository serves as a sandbox for learning quantum chemical calculations, automating post-processing, and producing publication-quality theoretical figures. The long-term goal is to establish a reproducible workflow that can be readily adapted to real research projects involving photocatalytic materials.
+
+---
+
+## 🎯 Objectives
+
+This project aims to:
+
+- Learn molecular DFT using ORCA
+- Explore wavefunction analysis with Multiwfn
+- Automate data extraction using Python
+- Produce publication-quality figures
+- Develop reproducible computational chemistry workflows
+- Prepare for real-world photocatalysis research
+
+---
+
+## 🛠️ Planned Workflow
+
+```text
+Molecular Structure
+        │
+        ├── ChemDraw
+        └── Avogadro
+        │
+        ▼
+      ORCA
+        │
+        ▼
+Optimized Wavefunction
+        │
+        ▼
+    Multiwfn
+        │
+        ├── HOMO / LUMO
+        ├── ESP
+        ├── Charges
+        ├── DOS
+        ├── NCI
+        └── TD-DFT Analysis
+        │
+        ▼
+      Python
+        │
+        ├── Data parsing
+        ├── Plotting
+        ├── Figure generation
+        └── Report automation
+```
+
+---
+
+## 📂 Repository Structure
+
+```text
+pdi-theory-demo/
+├── calculations/
+├── structures/
+├── scripts/
+├── analysis/
+├── figures/
+├── results/
+├── docs/
+├── README.md
+└── LICENSE
+```
+
+## 🔬 Planned Demonstration
+
+The initial demonstration will compare:
+
+- Parent PDI
+- Terminally modified PDI
+
+Possible analyses include:
+
+- Geometry optimization
+- Frontier molecular orbitals
+- HOMO–LUMO gap
+- Electrostatic potential (ESP)
+- Atomic charge analysis
+- O2 adsorption
+- Charge transfer
+- TD-DFT excitation
+- Publication-ready visualizations
+
+---
+
+## 🚀 Tech Stack
+
+- ORCA
+- Multiwfn
+- Python
+- NumPy
+- Matplotlib
+- Jupyter Notebook (optional)
+- ASE (planned)
+
+---
+
+## 📈 Future Plans
+
+Potential future additions include:
+
+- Automated ORCA input generation
+- Automatic convergence checking
+- Batch calculation management
+- TD-DFT spectrum generation
+- Publication-ready plotting utilities
+- Composite figure generation
+- Computational chemistry workflow automation
+
+---
+
+## 📚 Purpose
+
+This repository is primarily intended as a learning and development environment for computational chemistry.
+
+The code is designed to be modular, reproducible, and extensible so that components developed here can later be incorporated into larger research workflows and future scientific software projects.
+
+---
+
+## 👤 Author
+
+Angze Li
+
+MSci Chemistry
+Imperial College London
