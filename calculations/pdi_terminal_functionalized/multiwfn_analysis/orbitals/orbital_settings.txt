@@ -1,0 +1,4 @@
+Orbitals: HOMO and LUMO
+Cube grid: Multiwfn medium quality
+Recommended visualization isovalue: ±0.03 a.u.
+The same isovalue, orientation and rendering settings must be used for both molecules.
