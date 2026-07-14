@@ -1,0 +1,5 @@
+! r2SCAN-3c Opt TightSCF
+
+%maxcore 8000
+
+* xyzfile 0 1 pdi_terminal_functionalized_structure_initial.xyz
