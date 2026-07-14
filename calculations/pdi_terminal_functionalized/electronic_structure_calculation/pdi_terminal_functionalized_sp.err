@@ -1,0 +1,38 @@
+--------------------------------------------------------------------------
+A system call failed during shared memory initialization that should
+not have.  It is likely that your MPI job will now either abort or
+experience performance degradation.
+
+  Local host:  Angzes-MacBook-Pro.local
+  System call: unlink(2) /var/folders/n1/bmzcbfxs2fgc29_x3l4x_s_m0000gn/T//ompi.Angzes-MacBook-Pro.501/pid.10871/1/vader_segment.Angzes-MacBook-Pro.501.42930001.7
+  Error:       No such file or directory (errno 2)
+--------------------------------------------------------------------------
+[Angzes-MacBook-Pro.local:10871] 2 more processes have sent help message help-opal-shmem-mmap.txt / sys call fail
+[Angzes-MacBook-Pro.local:10871] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+--------------------------------------------------------------------------
+A system call failed during shared memory initialization that should
+not have.  It is likely that your MPI job will now either abort or
+experience performance degradation.
+
+  Local host:  Angzes-MacBook-Pro.local
+  System call: unlink(2) /var/folders/n1/bmzcbfxs2fgc29_x3l4x_s_m0000gn/T//ompi.Angzes-MacBook-Pro.501/pid.10898/1/vader_segment.Angzes-MacBook-Pro.501.42760001.6
+  Error:       No such file or directory (errno 2)
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+A system call failed during shared memory initialization that should
+not have.  It is likely that your MPI job will now either abort or
+experience performance degradation.
+
+  Local host:  Angzes-MacBook-Pro.local
+  System call: unlink(2) /var/folders/n1/bmzcbfxs2fgc29_x3l4x_s_m0000gn/T//ompi.Angzes-MacBook-Pro.501/pid.10930/1/vader_segment.Angzes-MacBook-Pro.501.42560001.2
+  Error:       No such file or directory (errno 2)
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+A system call failed during shared memory initialization that should
+not have.  It is likely that your MPI job will now either abort or
+experience performance degradation.
+
+  Local host:  Angzes-MacBook-Pro.local
+  System call: unlink(2) /var/folders/n1/bmzcbfxs2fgc29_x3l4x_s_m0000gn/T//ompi.Angzes-MacBook-Pro.501/pid.11453/1/vader_segment.Angzes-MacBook-Pro.501.44590001.0
+  Error:       No such file or directory (errno 2)
+--------------------------------------------------------------------------

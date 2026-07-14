@@ -1,0 +1,9 @@
+! wB97X-D4 def2-TZVP TightSCF RIJCOSX NoSym
+
+%pal
+  nprocs 8
+end
+
+%maxcore 3000
+
+* xyzfile 0 1 pdi_opt.xyz
