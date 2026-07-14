@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Local editor/project metadata
+.idea/
+
+# ORCA transient scratch / interrupted-job artifacts
+*.tmp
+*.tmp.*
+*.propint.tmp.*
+*.propintinp.tmp
+*.cpscfdata.tmp.*
+*.SHARKINP.tmp
+*.SHARK.KPRSCR.tmp
+*.hostnames
+*.bas[0-9]*
+
+# Interrupted validation frequency run; keep out of validation evidence commit
+calculations/orca_mpi_validation_20260713-2220/pdi_freq_pal4/
