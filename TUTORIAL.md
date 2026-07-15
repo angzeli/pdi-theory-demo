@@ -1900,3 +1900,66 @@ The Multiwfn stage is complete when:
 8. TDOS and fragment PDOS data have been exported as `*_dos_curve.txt`, `*_dos_line.txt` and `*_DOSfrag.txt`;
 9. all comparison plots use consistent axes, colour scales, orientations and isovalues;
 10. all menu selections, software versions and analysis settings are preserved in session logs or settings files.
+
+---
+
+## 🧾 5. Postprocess ORCA and Multiwfn outputs
+
+### 5.1 Run the full parser pipeline
+
+After all ORCA and Multiwfn files have been generated, run the parser pipeline from the repository root:
+
+```bash
+cd "/Users/liangze/Desktop/Tsinghua 2026 Summer/pdi_h2o2_production/pdi-theory-demo" && /opt/anaconda3/bin/python -m scripts.postprocess.parse_all --minimum-absolute-bond-order 0.05
+```
+
+The parser runs the manifest, validation, orbital, Hirshfeld charge, cube, ESP, Mayer bond-order, QTAIM and DOS/PDOS parsers in sequence.
+
+The expected final line is:
+
+```text
+All parsers completed successfully.
+```
+
+### 5.2 Parsed result folders
+
+The parser writes cleaned CSV and JSON outputs under:
+
+```text
+results/ground_state/
+├── manifest/
+│   └── input_manifest.csv
+├── validation/
+│   └── wavefunction_summary.csv
+├── orbitals/
+│   ├── frontier_orbital_energies.csv
+│   └── orbital_energies.csv
+├── charges/
+│   └── hirshfeld_atomic_charges.csv
+├── cubes/
+│   └── cube_metadata.csv
+├── esp/
+│   ├── esp_surface_metrics.csv
+│   ├── esp_extrema_from_text.csv
+│   └── esp_extrema_from_pdb.csv
+├── bond_orders/
+│   └── mayer_bond_orders.csv
+├── qtaim/
+│   ├── critical_points.csv
+│   ├── critical_point_properties.csv
+│   └── bond_path_points.csv
+└── dos/
+    ├── dos_curves.csv
+    ├── dos_lines.csv
+    └── dos_metadata.json
+```
+
+### 5.3 Completion criteria
+
+The postprocessing stage is complete when:
+
+1. the parser command ends with `All parsers completed successfully.`;
+2. `frontier_orbital_energies.csv` contains populated HOMO, LUMO and gap values for both molecules;
+3. `orbital_energies.csv` contains the full molecular-orbital energy table parsed from the Molden files;
+4. Hirshfeld charges, ESP extrema, Mayer bond orders, QTAIM data and DOS/PDOS curves have been written under `results/ground_state/`;
+5. any expected ESP warning is understood and documented rather than treated as a parser failure.
