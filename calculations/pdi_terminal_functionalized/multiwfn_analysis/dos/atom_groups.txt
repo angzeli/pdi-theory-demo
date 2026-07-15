@@ -1,0 +1,6 @@
+File: /Users/liangze/Desktop/Tsinghua 2026 Summer/pdi_h2o2_production/pdi-theory-demo/calculations/pdi_terminal_functionalized/multiwfn_analysis/pdi_terminal_functionalized_sp.molden.input
+
+ C: 1-21,23-24,26,31-40
+ N: 22,25
+ O: 27-30
+ H: 41-70

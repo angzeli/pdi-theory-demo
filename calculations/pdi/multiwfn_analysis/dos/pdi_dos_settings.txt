@@ -1,0 +1,9 @@
+    Energy unit: eV
+    Energy range: -12 to 4 eV
+    Broadening: Gaussian
+    FWHM: 0.30 eV
+    Projection fragments: C, N, O and H
+    Orbital-composition method: Mulliken
+    EOF
+TXT
+TXT
