@@ -22,7 +22,9 @@
 9. Save an editable Avogadro copy as `.cml`.
 10. Export the final pre-optimized structure as an XYZ file, for example:
 
-    `pdi_structure_initial.xyz`
+```text
+pdi_structure_initial.xyz
+```
 
 An XYZ file should contain:
 
@@ -32,23 +34,27 @@ An XYZ file should contain:
 
 Example:
 
-    3
-    Water molecule
-    O    0.000000    0.000000    0.000000
-    H    0.758602    0.000000    0.504284
-    H   -0.758602    0.000000    0.504284
+```text
+3
+Water molecule
+O    0.000000    0.000000    0.000000
+H    0.758602    0.000000    0.504284
+H   -0.758602    0.000000    0.504284
+```
 
 A clean structure folder may look like:
 
-    structures/
-    ├── chemdraw/
-    │   └── pdi_structure.cdxml
-    ├── mol/
-    │   └── pdi_structure.mol
-    ├── avogadro/
-    │   └── pdi_structure.cml
-    └── xyz/
-        └── pdi_structure_initial.xyz
+```text
+structures/
+├── chemdraw/
+│   └── pdi_structure.cdxml
+├── mol/
+│   └── pdi_structure.mol
+├── avogadro/
+│   └── pdi_structure.cml
+└── xyz/
+    └── pdi_structure_initial.xyz
+```
 
 Keeping each intermediate file makes the structure-generation workflow reproducible.
 
@@ -62,11 +68,13 @@ This section covers only geometry optimization and vibrational-frequency verific
 
 Copy the XYZ file generated in Section 1 into a dedicated calculation folder, for example:
 
-    calculations/
-    └── pdi/
-        └── geometry_optimization/
-            ├── pdi_structure_initial.xyz
-            └── pdi_opt.inp
+```text
+calculations/
+└── pdi/
+    └── geometry_optimization/
+        ├── pdi_structure_initial.xyz
+        └── pdi_opt.inp
+```
 
 Keeping the input file and the exact XYZ structure used for the calculation in the same folder makes the job self-contained and easier to reproduce.
 
@@ -74,15 +82,17 @@ Keeping the input file and the exact XYZ structure used for the calculation in t
 
 Create `pdi_opt.inp` with:
 
-    ! r2SCAN-3c Opt TightSCF
+```text
+! r2SCAN-3c Opt TightSCF
 
-    %pal
-      nprocs 4
-    end
+%pal
+  nprocs 4
+end
 
-    %maxcore 5000
+%maxcore 5000
 
-    * xyzfile 0 1 pdi_structure_initial.xyz
+* xyzfile 0 1 pdi_structure_initial.xyz
+```
 
 The main settings are:
 
@@ -99,50 +109,70 @@ The charge and multiplicity must be changed for ions, radicals, triplet oxygen, 
 
 Use the validated ORCA launcher rather than invoking the ORCA binary directly:
 
-    $HOME/bin/orca611 pdi_opt.inp > pdi_opt.out 2> pdi_opt.err
+```bash
+$HOME/bin/orca611 pdi_opt.inp > pdi_opt.out 2> pdi_opt.err
+```
 
 To prevent macOS from sleeping during a long job:
 
-    caffeinate -i $HOME/bin/orca611 \
-      pdi_opt.inp > pdi_opt.out 2> pdi_opt.err
+```bash
+caffeinate -i $HOME/bin/orca611 \
+  pdi_opt.inp > pdi_opt.out 2> pdi_opt.err
+```
 
 Monitor the output in another Terminal window:
 
-    tail -f pdi_opt.out
+```bash
+tail -f pdi_opt.out
+```
 
 Press `Ctrl+C` to stop `tail`; this does not stop ORCA.
 
 To confirm that ORCA is still running:
 
-    ps -o pid,%cpu,%mem,etime,command -ax | grep '[o]rca'
+```bash
+ps -o pid,%cpu,%mem,etime,command -ax | grep '[o]rca'
+```
 
 ### ✅ 2.4 Check the optimization result
 
 Confirm normal termination:
 
-    grep "ORCA TERMINATED NORMALLY" pdi_opt.out
+```bash
+grep "ORCA TERMINATED NORMALLY" pdi_opt.out
+```
 
 Expected result:
 
-    ****ORCA TERMINATED NORMALLY****
+```text
+****ORCA TERMINATED NORMALLY****
+```
 
 Confirm optimization convergence:
 
-    grep "THE OPTIMIZATION HAS CONVERGED" pdi_opt.out
+```bash
+grep "THE OPTIMIZATION HAS CONVERGED" pdi_opt.out
+```
 
 Expected result:
 
-    ***        THE OPTIMIZATION HAS CONVERGED     ***
+```text
+***        THE OPTIMIZATION HAS CONVERGED     ***
+```
 
 Inspect the error file:
 
-    cat pdi_opt.err
+```bash
+cat pdi_opt.err
+```
 
 An empty error file is ideal.
 
 The final optimized geometry is usually written as:
 
-    pdi_opt.xyz
+```text
+pdi_opt.xyz
+```
 
 Open this file in Avogadro and check that:
 
@@ -158,15 +188,17 @@ The file `pdi_opt_trj.xyz` contains the complete optimization trajectory and can
 
 Create a separate input file named `pdi_freq.inp`:
 
-    ! r2SCAN-3c Freq TightSCF
+```text
+! r2SCAN-3c Freq TightSCF
 
-    %pal
-      nprocs 4
-    end
+%pal
+  nprocs 4
+end
 
-    %maxcore 5000
+%maxcore 5000
 
-    * xyzfile 0 1 pdi_opt.xyz
+* xyzfile 0 1 pdi_opt.xyz
+```
 
 Use the optimized geometry from the previous step rather than the original Avogadro structure.
 
@@ -174,18 +206,24 @@ A frequency calculation evaluates the Hessian at the optimized geometry. It is u
 
 ### ▶️ 2.6 Run the frequency calculation
 
-    caffeinate -i $HOME/bin/orca611 \
-      pdi_freq.inp > pdi_freq.out 2> pdi_freq.err
+```bash
+caffeinate -i $HOME/bin/orca611 \
+  pdi_freq.inp > pdi_freq.out 2> pdi_freq.err
+```
 
 Monitor it with:
 
-    tail -f pdi_freq.out
+```bash
+tail -f pdi_freq.out
+```
 
 Frequency calculations can remain silent for long periods while ORCA evaluates derivative integrals or solves response equations. A lack of new output does not necessarily mean that the job has stalled.
 
 Check active ORCA processes with:
 
-    ps -o pid,%cpu,%mem,etime,command -ax | grep '[o]rca'
+```bash
+ps -o pid,%cpu,%mem,etime,command -ax | grep '[o]rca'
+```
 
 If an ORCA child process is using substantial CPU, the calculation is still active.
 
@@ -193,11 +231,15 @@ If an ORCA child process is using substantial CPU, the calculation is still acti
 
 Confirm normal termination:
 
-    grep "ORCA TERMINATED NORMALLY" pdi_freq.out
+```bash
+grep "ORCA TERMINATED NORMALLY" pdi_freq.out
+```
 
 Inspect the vibrational frequencies:
 
-    grep -A 140 "VIBRATIONAL FREQUENCIES" pdi_freq.out
+```bash
+grep -A 140 "VIBRATIONAL FREQUENCIES" pdi_freq.out
+```
 
 For a true minimum:
 
@@ -208,8 +250,10 @@ For a true minimum:
 
 If a significant imaginary frequency is present, visualize the corresponding mode using the ORCA Hessian file:
 
-    /Applications/Academic/orca_6_1_1/orca_pltvib \
-      pdi_freq.hess 6
+```bash
+/Applications/Academic/orca_6_1_1/orca_pltvib \
+  pdi_freq.hess 6
+```
 
 This creates an XYZ trajectory for the selected mode, which can be opened in Avogadro. Choose the mode number from the frequency table.
 
@@ -222,20 +266,22 @@ If the imaginary mode represents a genuine molecular distortion:
 
 A suitable re-optimization input is:
 
-    ! r2SCAN-3c Opt TightOpt TightSCF NoSym
+```text
+! r2SCAN-3c Opt TightOpt TightSCF NoSym
 
-    %pal
-      nprocs 4
-    end
+%pal
+  nprocs 4
+end
 
-    %maxcore 5000
+%maxcore 5000
 
-    %geom
-      Calc_Hess true
-      Recalc_Hess 5
-    end
+%geom
+  Calc_Hess true
+  Recalc_Hess 5
+end
 
-    * xyzfile 0 1 pdi_mode_displaced.xyz
+* xyzfile 0 1 pdi_mode_displaced.xyz
+```
 
 ### 📌 2.8 Completion criteria
 
@@ -258,18 +304,18 @@ After the optimized geometry has been verified as a true minimum by a frequency 
 Create a dedicated folder for the electronic-structure calculation, for example:
 
 ```text
-    calculations/
-    └── pdi/
-        └── electronic_structure_calculation/
-            ├── pdi_opt.xyz
-            └── pdi_sp.inp
+calculations/
+└── pdi/
+    └── electronic_structure_calculation/
+        ├── pdi_opt.xyz
+        └── pdi_sp.inp
 ```
 
 Copy the frequency-validated optimized geometry into this folder:
 
-```text
-    cp ../geometry_optimization/pdi_opt.xyz \
-      ./pdi_opt.xyz
+```bash
+cp ../geometry_optimization/pdi_opt.xyz \
+  ./pdi_opt.xyz
 ```
 
 Keeping a copy of the exact geometry used for the single-point calculation makes the folder self-contained and preserves the calculation provenance.
@@ -279,15 +325,15 @@ Keeping a copy of the exact geometry used for the single-point calculation makes
 Create `pdi_sp.inp` with:
 
 ```text
-    ! wB97X-D4 def2-TZVP TightSCF RIJCOSX NoSym
+! wB97X-D4 def2-TZVP TightSCF RIJCOSX NoSym
 
-    %pal
-      nprocs 8
-    end
+%pal
+  nprocs 8
+end
 
-    %maxcore 3000
+%maxcore 3000
 
-    * xyzfile 0 1 pdi_opt.xyz
+* xyzfile 0 1 pdi_opt.xyz
 ```
 
 The main settings are:
@@ -308,15 +354,16 @@ The charge and multiplicity must be changed for ions, radicals, triplet oxygen, 
 ### ▶️ 3.3 Run the calculation
 
 Use the validated ORCA launcher:
+
 ```bash
-    caffeinate -i $HOME/bin/orca611 \
-      pdi_sp.inp > pdi_sp.out 2> pdi_sp.err
+caffeinate -i $HOME/bin/orca611 \
+  pdi_sp.inp > pdi_sp.out 2> pdi_sp.err
 ```
 
 Monitor the output in another Terminal window:
 
 ```bash
-    tail -f pdi_sp.out
+tail -f pdi_sp.out
 ```
 
 Press `Ctrl+C` to stop `tail`; this does not stop ORCA.
@@ -324,13 +371,13 @@ Press `Ctrl+C` to stop `tail`; this does not stop ORCA.
 To confirm that the parallel calculation is active:
 
 ```bash
-    ps -o pid,%cpu,%mem,etime,command -ax | grep '[o]rca'
+ps -o pid,%cpu,%mem,etime,command -ax | grep '[o]rca'
 ```
 
 Near the beginning of the output, ORCA should report the requested number of MPI processes, for example:
 
-```bash
-    Program running with 8 parallel MPI-processes
+```text
+Program running with 8 parallel MPI-processes
 ```
 
 ### ✅ 3.4 Check the result
@@ -338,19 +385,19 @@ Near the beginning of the output, ORCA should report the requested number of MPI
 Confirm normal termination:
 
 ```bash
-    grep "ORCA TERMINATED NORMALLY" pdi_sp.out
+grep "ORCA TERMINATED NORMALLY" pdi_sp.out
 ```
 
 Confirm that a final electronic energy was produced:
 
 ```bash
-    grep "FINAL SINGLE POINT ENERGY" pdi_sp.out
+grep "FINAL SINGLE POINT ENERGY" pdi_sp.out
 ```
 
 Inspect the error file:
 
 ```bash
-    cat pdi_sp.err
+cat pdi_sp.err
 ```
 
 An empty error file is ideal. Nonfatal MPI cleanup warnings may occasionally appear after a normally terminated calculation, but they should be recorded and distinguished from genuine calculation failures.
@@ -358,8 +405,8 @@ An empty error file is ideal. Nonfatal MPI cleanup warnings may occasionally app
 Search explicitly for common failure messages:
 
 ```bash
-    grep -Ei "fatal error|error termination|segmentation fault|MPI_ERR|aborting|library not loaded" \
-      pdi_sp.out pdi_sp.err
+grep -Ei "fatal error|error termination|segmentation fault|MPI_ERR|aborting|library not loaded" \
+  pdi_sp.out pdi_sp.err
 ```
 
 The calculation should only be treated as successful if:
@@ -387,14 +434,14 @@ The `.gbw` file is the most important starting point for later orbital, electros
 Convert the ORCA `.gbw` file into Molden format:
 
 ```bash
-    /Applications/Academic/orca_6_1_1/orca_2mkl \
-      pdi_sp -molden
+/Applications/Academic/orca_6_1_1/orca_2mkl \
+  pdi_sp -molden
 ```
 
 This should generate:
 
 ```text
-    pdi_sp.molden.input
+pdi_sp.molden.input
 ```
 
 ### 📌 3.7 Completion criteria
@@ -433,12 +480,15 @@ The following analyses will be performed:
 
 The input wavefunctions are:
 
-    calculations/pdi/multiwfn_analysis/pdi_sp.molden.input
+```text
+calculations/pdi/multiwfn_analysis/pdi_sp.molden.input
+```
 
 and:
 
-    calculations/pdi_terminal_functionalized/multiwfn_analysis/
-    pdi_terminal_functionalized_sp.molden.input
+```text
+calculations/pdi_terminal_functionalized/multiwfn_analysis/pdi_terminal_functionalized_sp.molden.input
+```
 
 All analyses should use identical settings for both molecules wherever a direct comparison is intended.
 
@@ -448,53 +498,73 @@ At the main menu, `q` exits Multiwfn.
 
 Many submenus expect an integer and do not accept `q`. Entering `q` in such a submenu may produce:
 
-    Fortran runtime error: Bad integer for item 1 in list input
+```text
+Fortran runtime error: Bad integer for item 1 in list input
+```
 
 Use the displayed return option instead, normally:
 
-    0
+```text
+0
+```
 
 or:
 
-    -10
+```text
+-10
+```
 
 Return to the main menu before entering:
 
-    q
+```text
+q
+```
 
 ### 🗂️ 4.0 One-time Terminal setup
 
 Move to the repository root:
 
-    cd "/Users/liangze/Desktop/Tsinghua 2026 Summer/pdi_h2o2_production/pdi-theory-demo"
+```bash
+cd "/Users/liangze/Desktop/Tsinghua 2026 Summer/pdi_h2o2_production/pdi-theory-demo"
+```
 
 Define reusable paths:
 
-    export REPO="$PWD"
+```bash
+export REPO="$PWD"
 
-    export PDI="$REPO/calculations/pdi/multiwfn_analysis"
-    export TFPDI="$REPO/calculations/pdi_terminal_functionalized/multiwfn_analysis"
+export PDI="$REPO/calculations/pdi/multiwfn_analysis"
+export TFPDI="$REPO/calculations/pdi_terminal_functionalized/multiwfn_analysis"
 
-    export PDI_WFN="$PDI/pdi_sp.molden.input"
-    export TFPDI_WFN="$TFPDI/pdi_terminal_functionalized_sp.molden.input"
+export PDI_WFN="$PDI/pdi_sp.molden.input"
+export TFPDI_WFN="$TFPDI/pdi_terminal_functionalized_sp.molden.input"
+```
 
 Locate the Multiwfn executable:
 
-    export MWFN="$(command -v Multiwfn 2>/dev/null || command -v multiwfn 2>/dev/null)"
+```bash
+export MWFN="$(command -v Multiwfn 2>/dev/null || command -v multiwfn 2>/dev/null)"
+```
 
 Check the result:
 
-    echo "$MWFN"
+```bash
+echo "$MWFN"
+```
 
 Confirm that both wavefunction files exist:
 
-    ls -lh "$PDI_WFN" "$TFPDI_WFN"
+```bash
+ls -lh "$PDI_WFN" "$TFPDI_WFN"
+```
 
 Create the analysis folders if necessary:
 
-    mkdir -p \
-      "$PDI"/{wavefunction_validation,orbitals,charges,esp,bond_orders,qtaim,elf_lol,dos,cubes} \
-      "$TFPDI"/{wavefunction_validation,orbitals,charges,esp,bond_orders,qtaim,elf_lol,dos,cubes}
+```bash
+mkdir -p \
+  "$PDI"/{wavefunction_validation,orbitals,charges,esp,bond_orders,qtaim,elf_lol,dos} \
+  "$TFPDI"/{wavefunction_validation,orbitals,charges,esp,bond_orders,qtaim,elf_lol,dos}
+```
 
 These environment variables remain active only in the current Terminal session.
 
@@ -508,49 +578,59 @@ Before generating any numerical or graphical results, confirm that Multiwfn has 
 
 Enter:
 
-    cd "$PDI/wavefunction_validation"
-
-    "$MWFN" "$PDI_WFN" 2>&1 | tee pdi_validation.session.log
+```bash
+cd "$PDI/wavefunction_validation"
+"$MWFN" "$PDI_WFN" 2>&1 | tee pdi_validation.session.log
+```
 
 After the wavefunction has loaded, inspect the startup summary.
 
 The expected values are:
 
-    Formula: H10 C24 N2 O4
-    Total atoms: 40
-    Total electrons: 200
-    Basis functions: 990
-    Occupied orbitals: 100
-    HOMO index: 100
-    LUMO index: 101
-    Wavefunction type: restricted closed-shell
+```text
+Formula: H10 C24 N2 O4
+Total atoms: 40
+Total electrons: 200
+Basis functions: 990
+Occupied orbitals: 100
+HOMO index: 100
+LUMO index: 101
+Wavefunction type: restricted closed-shell
+```
 
 At the main menu, enter:
 
-    q
+```text
+q
+```
 
 ### 4.1.2 Terminal-functionalized PDI
 
 Enter:
 
-    cd "$TFPDI/wavefunction_validation"
-
-    "$MWFN" "$TFPDI_WFN" 2>&1 \
-      | tee pdi_terminal_functionalized_validation.session.log
+```bash
+cd "$TFPDI/wavefunction_validation"
+"$MWFN" "$TFPDI_WFN" 2>&1 \
+  | tee pdi_terminal_functionalized_validation.session.log
+```
 
 The expected values are:
 
-    Total atoms: 70
-    Total electrons: 280
-    Basis functions: 1420
-    Occupied orbitals: 140
-    HOMO index: 140
-    LUMO index: 141
-    Wavefunction type: restricted closed-shell
+```text
+Total atoms: 70
+Total electrons: 280
+Basis functions: 1420
+Occupied orbitals: 140
+HOMO index: 140
+LUMO index: 141
+Wavefunction type: restricted closed-shell
+```
 
 At the main menu, enter:
 
-    q
+```text
+q
+```
 
 The validation stage is complete when the atom count, electron count, basis size, orbital occupation and wavefunction type are chemically consistent.
 
@@ -570,130 +650,95 @@ Use the same:
 
 A visualization isovalue of approximately:
 
-    ±0.03 a.u.
+```text
+±0.03 a.u.
+```
 
 is a reasonable starting point.
 
-### 4.2.1 Parent PDI HOMO
+### 4.2.1 Parent PDI HOMO and LUMO
 
 Enter:
 
-    cd "$PDI/orbitals"
-
-    "$MWFN" "$PDI_WFN" 2>&1 | tee pdi_homo.session.log
+```bash
+cd "$PDI/orbitals"
+"$MWFN" "$PDI_WFN" 2>&1 | tee pdi_orbitals.session.log
+```
 
 At the Multiwfn main menu, enter:
 
-    5
+```text
+200
+3
+h
+2
+3
+l
+2
+0
+q
+```
 
-Select:
+This selects `Other functions (Part 2)` → `Generate cube file for multiple orbital wavefunctions`, exports the HOMO as `h.cub`, exports the LUMO as `l.cub`, returns to the main menu, and exits.
 
-    4
+Inspect the generated files:
 
-for orbital wavefunction.
+```bash
+ls -lt *.cub
+```
 
-When asked for the orbital index, enter:
+Rename the generated cubes:
 
-    100
+```bash
+mv h.cub pdi_homo.cub
+mv l.cub pdi_lumo.cub
+```
 
-Select the medium-quality grid:
-
-    2
-
-When the post-processing menu appears, select:
-
-    2
-
-to export the grid as a Gaussian cube file.
-
-Return to the main menu using the displayed return option, then enter:
-
-    q
-
-Inspect the generated file:
-
-    ls -lt *.cub
-
-Rename the newly generated orbital cube:
-
-    mv <generated_HOMO_cube>.cub pdi_homo.cub
-
-Replace `<generated_HOMO_cube>.cub` with the actual filename shown by `ls`.
-
-### 4.2.2 Parent PDI LUMO
-
-Run Multiwfn again:
-
-    "$MWFN" "$PDI_WFN" 2>&1 | tee pdi_lumo.session.log
-
-Use:
-
-    5
-    4
-    101
-    2
-    2
-
-Return to the main menu and quit.
-
-Rename the generated cube:
-
-    mv <generated_LUMO_cube>.cub pdi_lumo.cub
-
-### 4.2.3 Terminal-functionalized PDI HOMO
+### 4.2.2 Terminal-functionalized PDI HOMO and LUMO
 
 Enter:
 
-    cd "$TFPDI/orbitals"
-
-    "$MWFN" "$TFPDI_WFN" 2>&1 \
-      | tee pdi_terminal_functionalized_homo.session.log
-
-Use:
-
-    5
-    4
-    140
-    2
-    2
-
-Return to the main menu and quit.
-
-Rename the generated cube:
-
-    mv <generated_HOMO_cube>.cub \
-      pdi_terminal_functionalized_homo.cub
-
-### 4.2.4 Terminal-functionalized PDI LUMO
-
-Run:
-
-    "$MWFN" "$TFPDI_WFN" 2>&1 \
-      | tee pdi_terminal_functionalized_lumo.session.log
+```bash
+cd "$TFPDI/orbitals"
+"$MWFN" "$TFPDI_WFN" 2>&1 \
+  | tee pdi_terminal_functionalized_orbitals.session.log
+```
 
 Use:
 
-    5
-    4
-    141
-    2
-    2
+```text
+200
+3
+h
+2
+3
+l
+2
+0
+q
+```
 
-Return to the main menu and quit.
+Rename the generated cubes:
 
-Rename the generated cube:
+```bash
+mv h.cub pdi_terminal_functionalized_homo.cub
+mv l.cub pdi_terminal_functionalized_lumo.cub
+```
 
-    mv <generated_LUMO_cube>.cub \
-      pdi_terminal_functionalized_lumo.cub
+### 4.2.3 Record common visualization settings
 
 Create a record of the common visualization settings:
 
-    cat > orbital_settings.txt <<'EOF'
-    Orbitals: HOMO and LUMO
-    Grid quality: Multiwfn medium-quality grid
-    Recommended isovalue: ±0.03 a.u.
-    Identical orientation, isovalue and rendering conventions must be used for both molecules.
-    EOF
+```bash
+cat > orbital_settings.txt <<'EOF'
+Orbitals: HOMO and LUMO
+Grid quality: Multiwfn medium-quality grid
+Recommended isovalue: +/-0.03 a.u.
+Identical orientation, isovalue and rendering conventions must be used for both molecules.
+EOF
+```
+
+If a scripted Multiwfn run reaches an integer menu after cube export, use `0` to return before entering `q`. Entering `q` directly in the integer prompt is the validated cause of the `Bad integer for item 1 in list input` failure.
 
 The analysis should compare:
 
@@ -716,56 +761,69 @@ Hirshfeld charges are not the same as Bader or QTAIM basin charges.
 
 Enter:
 
-    cd "$PDI/charges"
-
-    "$MWFN" "$PDI_WFN" 2>&1 | tee pdi_hirshfeld.session.log
+```bash
+cd "$PDI/charges"
+"$MWFN" "$PDI_WFN" 2>&1 | tee pdi_hirshfeld.session.log
+```
 
 At the main menu, enter:
 
-    7
+```text
+7
+1
+1
+0
+q
+```
 
-Select:
-
-    1
-
-for Hirshfeld atomic charges.
-
-When asked how to obtain free-atom densities, select the option labelled:
-
-    Use built-in sphericalized free-atom densities
-
-When offered an export option, export the charges to a `.chg` file.
-
-Return to the main menu and quit.
+This selects population analysis, Hirshfeld atomic charges, built-in sphericalized free-atom densities, returns from the population menu with `0`, and exits from the main menu with `q`.
 
 Inspect the generated files:
 
-    ls -lt
+```bash
+ls -lh *.chg
+```
 
-Rename the charge file:
+The validated output is a `.chg` file containing element symbol, Cartesian coordinates and Hirshfeld charge. If your Multiwfn build uses a filename other than `charges.chg`, replace only the left-hand filename in the command below with the filename shown by `ls -lh *.chg`.
 
-    mv <generated_charge_file>.chg pdi_hirshfeld.chg
+```bash
+mv charges.chg pdi_hirshfeld.chg
+```
+
+If the `.chg` file was already written with the final name, leave it unchanged and verify it:
+
+```bash
+ls -lh pdi_hirshfeld.chg
+```
 
 ### 4.3.2 Terminal-functionalized PDI
 
 Enter:
 
-    cd "$TFPDI/charges"
-
-    "$MWFN" "$TFPDI_WFN" 2>&1 \
-      | tee pdi_terminal_functionalized_hirshfeld.session.log
+```bash
+cd "$TFPDI/charges"
+"$MWFN" "$TFPDI_WFN" 2>&1 \
+  | tee pdi_terminal_functionalized_hirshfeld.session.log
+```
 
 Use the same settings:
 
-    7
-    1
-
-Export the charges to a `.chg` file.
+```text
+7
+1
+1
+0
+q
+```
 
 Rename it:
 
-    mv <generated_charge_file>.chg \
-      pdi_terminal_functionalized_hirshfeld.chg
+```bash
+ls -lh *.chg
+mv charges.chg pdi_terminal_functionalized_hirshfeld.chg
+```
+
+If your Multiwfn build uses a filename other than `charges.chg`, replace only the left-hand filename with the file shown by `ls -lh *.chg`.
 
 For the functionalized system, the most useful comparison is not necessarily every individual atomic charge. Sum the charges over chemically meaningful fragments such as:
 
@@ -787,7 +845,7 @@ The electrostatic-potential stage contains three parts:
 
 The full three-dimensional ESP grid is computationally expensive. On some macOS builds, this routine may use only approximately one CPU core even when several OpenMP threads are configured.
 
-Avoid running games or other CPU-intensive applications during this calculation.
+Avoid running other CPU-intensive applications during this calculation. Medium-quality ESP calculations on the larger terminal-functionalized molecule may take more than two hours on macOS, and the ESP evaluation can be effectively single-threaded.
 
 ### 4.4.0 Test cube export before a long calculation
 
@@ -795,17 +853,22 @@ Before running a medium-quality ESP calculation, test whether the installed Mult
 
 Enter:
 
-    cd "$PDI/esp"
-
-    export OMP_NUM_THREADS=8
-
-    "$MWFN" "$PDI_WFN"
+```bash
+cd "$PDI/esp"
+export OMP_NUM_THREADS=8
+"$MWFN" "$PDI_WFN"
+```
 
 Use:
 
-    5
-    12
-    2
+```text
+5
+12
+1
+2
+0
+q
+```
 
 This selects:
 
@@ -813,31 +876,33 @@ This selects:
 - total electrostatic potential;
 - low-quality grid.
 
-After the ESP calculation finishes, select:
-
-    2
-
-to export the grid as a Gaussian cube file.
+After the ESP calculation finishes, `2` exports the grid as a Gaussian cube file, `0` returns to the main menu, and `q` exits.
 
 Check whether a file such as the following was produced:
 
-    totesp.cub
-
-Exit using the displayed return option and then `q` from the main menu.
+```text
+totesp.cub
+```
 
 Check:
 
-    ls -lh *.cub
+```bash
+ls -lh *.cub
+```
 
 If the low-quality export succeeds, delete the test file:
 
-    rm -f totesp.cub
+```bash
+rm -f totesp.cub
+```
 
 and proceed to the medium-quality calculation.
 
 If selecting export option `2` produces:
 
-    Fortran runtime error: Bad integer for item 1 in list input
+```text
+Fortran runtime error: Bad integer for item 1 in list input
+```
 
 do not immediately repeat the multi-hour calculation with the same executable. Test the official Multiwfn macOS binary using the low-quality grid first. Only run the medium-quality ESP calculation after cube export has been validated end-to-end.
 
@@ -845,15 +910,21 @@ do not immediately repeat the multi-hour calculation with the same executable. T
 
 Enter:
 
-    cd "$PDI/esp"
-
-    "$MWFN" "$PDI_WFN" 2>&1 | tee pdi_density_cube.session.log
+```bash
+cd "$PDI/esp"
+"$MWFN" "$PDI_WFN" 2>&1 | tee pdi_density_cube.session.log
+```
 
 Use:
 
-    5
-    1
-    2
+```text
+5
+1
+2
+2
+0
+q
+```
 
 This selects:
 
@@ -861,34 +932,39 @@ This selects:
 - electron density;
 - medium-quality grid.
 
-At the post-processing menu, select:
-
-    2
-
-to export a Gaussian cube file.
-
-Return to the main menu and quit.
+The second `2` exports the Gaussian cube file from the post-processing menu, `0` returns to the main menu, and `q` exits.
 
 Rename the output:
 
-    mv density.cub pdi_density.cub
+```bash
+mv density.cub pdi_density.cub
+```
 
 Confirm:
 
-    ls -lh pdi_density.cub
+```bash
+ls -lh pdi_density.cub
+```
 
 ### 4.4.2 Parent PDI ESP cube
 
 Enter:
 
-    caffeinate -i env OMP_NUM_THREADS=8 \
-      "$MWFN" "$PDI_WFN"
+```bash
+caffeinate -i env OMP_NUM_THREADS=8 \
+  "$MWFN" "$PDI_WFN"
+```
 
 Use:
 
-    5
-    12
-    2
+```text
+5
+12
+2
+2
+0
+q
+```
 
 This selects:
 
@@ -896,23 +972,19 @@ This selects:
 - total electrostatic potential;
 - medium-quality grid.
 
-Let the calculation finish completely.
-
-At the post-processing menu, select:
-
-    2
-
-to export the ESP grid as a Gaussian cube file.
-
-Return to the main menu and quit.
+Let the calculation finish completely. The second `2` exports the ESP grid as `totesp.cub`, `0` returns to the main menu, and `q` exits.
 
 Rename the output:
 
-    mv totesp.cub pdi_esp.cub
+```bash
+mv totesp.cub pdi_esp.cub
+```
 
 Confirm:
 
-    ls -lh pdi_density.cub pdi_esp.cub
+```bash
+ls -lh pdi_density.cub pdi_esp.cub
+```
 
 The density and ESP cubes should use the same grid quality and spatial region if they will be combined or compared point-by-point.
 
@@ -920,16 +992,22 @@ The density and ESP cubes should use the same grid quality and spatial region if
 
 Run:
 
-    "$MWFN" "$PDI_WFN" 2>&1 | tee pdi_esp_surface.session.log
+```bash
+"$MWFN" "$PDI_WFN" 2>&1 | tee pdi_esp_surface.session.log
+```
 
 At the main menu, enter:
 
-    12
+```text
+12
+0
+1
+2
+-1
+-1
+q
+```
 
-Then enter:
-
-    0
-    
 Start the surface analysis and wait for Multiwfn to finish evaluating the molecular surface.
 
 The output should report quantities such as:
@@ -948,51 +1026,22 @@ The output should report quantities such as:
 
 - average ESP and related surface statistics.
 
-When the surface-analysis post-processing menu appears, enter:
-
-    1
-
-to export the extrema and surface statistics to:
-
-    surfanalysis.txt
-
-Then enter:
-
-    2
-
-to export the coordinates of the surface extrema to:
-
-    surfanalysis.pdb
-
-Return to the quantitative surface-analysis menu using:
-
-    -1
-
-Then return to the Multiwfn main menu using:
-
-    -1
-
-At the main menu, exit gracefully with:
-
-    q
+In this sequence, `12` opens quantitative molecular-surface analysis, `0` starts the analysis with the default electron-density isovalue `0.001` a.u. and mapped ESP, `1` exports `surfanalysis.txt`, `2` exports `surfanalysis.pdb`, `-1` returns to the upper surface-analysis menu, the second `-1` returns to the main menu, and `q` exits.
 
 Back in Terminal, rename the exported files:
 
-    mv surfanalysis.txt \
-
-      pdi_esp_surface_statistics.txt
-
-    mv surfanalysis.pdb \
-
-      pdi_esp_extrema.pdb
+```bash
+mv surfanalysis.txt pdi_esp_surface_statistics.txt
+mv surfanalysis.pdb pdi_esp_extrema.pdb
+```
 
 Confirm that both files exist:
 
-    ls -lh \
-
-      pdi_esp_surface_statistics.txt \
-
-      pdi_esp_extrema.pdb
+```bash
+ls -lh \
+  pdi_esp_surface_statistics.txt \
+  pdi_esp_extrema.pdb
+```
 
 The text file contains the numerical surface-ESP results, while the PDB file contains the positions of the ESP extrema for visualization in programs such as VMD, VESTA, ChimeraX, or Avogadro.
 
@@ -1000,61 +1049,83 @@ The text file contains the numerical surface-ESP results, while the PDB file con
 
 Enter:
 
-    cd "$TFPDI/esp"
-
-    "$MWFN" "$TFPDI_WFN" 2>&1 \
-      | tee pdi_terminal_functionalized_density_cube.session.log
+```bash
+cd "$TFPDI/esp"
+"$MWFN" "$TFPDI_WFN" 2>&1 \
+  | tee pdi_terminal_functionalized_density_cube.session.log
+```
 
 Use:
 
-    5
-    1
-    2
-    2
-
-Return to the main menu and quit.
+```text
+5
+1
+2
+2
+0
+q
+```
 
 Rename:
 
-    mv density.cub \
-      pdi_terminal_functionalized_density.cub
+```bash
+mv density.cub pdi_terminal_functionalized_density.cub
+```
 
 ### 4.4.5 Terminal-functionalized PDI ESP cube
 
 Enter:
 
-    caffeinate -i env OMP_NUM_THREADS=8 \
-      "$MWFN" "$TFPDI_WFN"
+```bash
+caffeinate -i env OMP_NUM_THREADS=8 \
+  "$MWFN" "$TFPDI_WFN"
+```
 
 Use:
 
-    5
-    12
-    2
-
-After the calculation finishes, export using:
-
-    2
-
-Return to the main menu and quit.
+```text
+5
+12
+2
+2
+0
+q
+```
 
 Rename:
 
-    mv totesp.cub \
-      pdi_terminal_functionalized_esp.cub
+```bash
+mv totesp.cub pdi_terminal_functionalized_esp.cub
+```
 
 ### 4.4.6 Terminal-functionalized PDI quantitative surface ESP
 
 Run:
 
-    "$MWFN" "$TFPDI_WFN" 2>&1 \
-      | tee pdi_terminal_functionalized_esp_surface.session.log
+```bash
+"$MWFN" "$TFPDI_WFN" 2>&1 \
+  | tee pdi_terminal_functionalized_esp_surface.session.log
+```
 
 Use the same surface settings as for parent PDI:
 
-    Electron-density isovalue: 0.001 a.u.
-    Mapped function: Total electrostatic potential
-    Grid spacing: approximately 0.20–0.25 Å
+```text
+Electron-density isovalue: 0.001 a.u.
+Mapped function: Total electrostatic potential
+Grid spacing: 0.25 Bohr in the validated run
+```
+
+Enter:
+
+```text
+12
+0
+1
+2
+-1
+-1
+q
+```
 
 Start the surface analysis and wait for Multiwfn to finish evaluating the molecular surface.
 
@@ -1074,43 +1145,20 @@ The output should report quantities such as:
 
 - average ESP and related surface statistics.
 
-When the surface-analysis post-processing menu appears, enter:
-
-    1
-
-to export the extrema and surface statistics to:
-
-    surfanalysis.txt
-
-Then enter:
-
-    2
-
-to export the coordinates of the surface extrema to:
-
-    surfanalysis.pdb
-
-Return to the quantitative surface-analysis menu using:
-
-    -1
-
-Then return to the Multiwfn main menu using:
-
-    -1
-
-At the main menu, exit gracefully with:
-
-    q
-
 Back in Terminal, rename the exported files:
 
-    mv surfanalysis.txt pdi_terminal_functionalizd_esp_surface_statistics.txt
-
-    mv surfanalysis.pdb pdi_terminal_functionalizd_esp_extrema.pdb
+```bash
+mv surfanalysis.txt pdi_terminal_functionalized_esp_surface_statistics.txt
+mv surfanalysis.pdb pdi_terminal_functionalized_esp_extrema.pdb
+```
 
 Confirm that both files exist:
 
-    ls -lh pdi_terminal_functionalizd_esp_surface_statistics.txt pdi_terminal_functionalizd_esp_extrema.pdb
+```bash
+ls -lh \
+  pdi_terminal_functionalized_esp_surface_statistics.txt \
+  pdi_terminal_functionalized_esp_extrema.pdb
+```
 
 The text file contains the numerical surface-ESP results, while the PDB file contains the positions of the ESP extrema for visualization in programs such as VMD, VESTA, ChimeraX, or Avogadro.
 
@@ -1132,53 +1180,58 @@ Mayer bond orders provide a quantitative description of bonding based on the ato
 
 Enter:
 
-    cd "$PDI/bond_orders"
-
-    "$MWFN" "$PDI_WFN" 2>&1 | tee pdi_mayer.session.log
+```bash
+cd "$PDI/bond_orders"
+"$MWFN" "$PDI_WFN" 2>&1 | tee pdi_mayer.session.log
+```
 
 At the main menu, enter:
 
-    9
+```text
+9
+1
+0
+q
+```
 
-Select:
-
-    1
-
-for Mayer bond-order analysis.
-
-Export the complete Mayer bond-order matrix when offered.
-
-Return to the main menu and quit.
+This selects bond-order analysis, Mayer bond-order analysis, returns to the main menu with `0`, and exits with `q`. Multiwfn writes the complete Mayer bond-order matrix as `bndmat.txt`.
 
 Inspect:
 
-    ls -lt
+```bash
+ls -lt
+```
 
 Rename the matrix:
 
-    mv <generated_Mayer_file>.txt \
-      pdi_mayer_bond_orders.txt
+```bash
+mv bndmat.txt pdi_mayer_bond_orders.txt
+```
 
 ### 4.5.2 Terminal-functionalized PDI
 
 Enter:
 
-    cd "$TFPDI/bond_orders"
-
-    "$MWFN" "$TFPDI_WFN" 2>&1 \
-      | tee pdi_terminal_functionalized_mayer.session.log
+```bash
+cd "$TFPDI/bond_orders"
+"$MWFN" "$TFPDI_WFN" 2>&1 \
+  | tee pdi_terminal_functionalized_mayer.session.log
+```
 
 Use:
 
-    9
-    1
-
-Export the matrix.
+```text
+9
+1
+0
+q
+```
 
 Rename it:
 
-    mv <generated_Mayer_file>.txt \
-      pdi_terminal_functionalized_mayer_bond_orders.txt
+```bash
+mv bndmat.txt pdi_terminal_functionalized_mayer_bond_orders.txt
+```
 
 For the final comparison, extract only chemically meaningful bonds, for example:
 
@@ -1208,55 +1261,44 @@ This stage performs topology analysis. Full QTAIM basin integration and basin ch
 
 Enter:
 
-    cd "$PDI/qtaim"
-
-    "$MWFN" "$PDI_WFN" 2>&1 | tee pdi_qtaim.session.log
+```bash
+cd "$PDI/qtaim"
+"$MWFN" "$PDI_WFN" 2>&1 | tee pdi_qtaim.session.log
+```
 
 At the main menu, enter:
 
-    2
+```text
+2
+2
+3
+4
+8
+-4
+4
+6
+0
+-5
+4
+6
+0
+7
+0
+-10
+q
+```
 
-Run the options labelled approximately:
-
-    Search critical points starting from nuclear positions
-    Search critical points starting from atom-pair midpoints
-    Search critical points starting from triangle centres
-
-For Multiwfn 3.8, these are commonly accessed using:
-
-    2
-    3
-    4
-
-Generate paths connecting nuclei and bond critical points using the option labelled:
-
-    Generate paths connecting nuclei and bond critical points
-
-This is commonly option:
-
-    8
-
-Use the critical-point management menu to export:
-
-    CPs.txt
-    CPs.pdb
-
-Use the path management menu to export:
-
-    paths.txt
-    paths.pdb
-
-Export properties evaluated at critical points:
-
-    CPprop.txt
+This sequence opens topology analysis, searches critical points from nuclear positions, atom-pair midpoints and triangle centres, generates bond paths, exports `CPs.txt` and `CPs.pdb`, exports `paths.txt` and `paths.pdb`, exports all critical-point properties to `CPprop.txt`, returns to the main menu, and exits.
 
 Rename:
 
-    mv CPs.txt pdi_CPs.txt
-    mv CPs.pdb pdi_CPs.pdb
-    mv paths.txt pdi_paths.txt
-    mv paths.pdb pdi_paths.pdb
-    mv CPprop.txt pdi_CPprop.txt
+```bash
+mv CPs.txt pdi_CPs.txt
+mv CPs.pdb pdi_CPs.pdb
+mv paths.txt pdi_paths.txt
+mv paths.pdb pdi_paths.pdb
+mv CPprop.txt pdi_CPprop.txt
+```
 
 The critical-point property file may contain:
 
@@ -1273,41 +1315,53 @@ Check whether the critical-point counts satisfy the topology relationship report
 
 Enter:
 
-    cd "$TFPDI/qtaim"
-
-    "$MWFN" "$TFPDI_WFN" 2>&1 \
-      | tee pdi_terminal_functionalized_qtaim.session.log
+```bash
+cd "$TFPDI/qtaim"
+"$MWFN" "$TFPDI_WFN" 2>&1 \
+  | tee pdi_terminal_functionalized_qtaim.session.log
+```
 
 Repeat the same critical-point searches:
 
-    2
-    3
-    4
+```text
+2
+2
+3
+4
+8
+-4
+4
+6
+0
+-5
+4
+6
+0
+7
+0
+-10
+q
+```
 
 Generate bond paths and export:
 
-    CPs.txt
-    CPs.pdb
-    paths.txt
-    paths.pdb
-    CPprop.txt
+```text
+CPs.txt
+CPs.pdb
+paths.txt
+paths.pdb
+CPprop.txt
+```
 
 Rename:
 
-    mv CPs.txt \
-      pdi_terminal_functionalized_CPs.txt
-
-    mv CPs.pdb \
-      pdi_terminal_functionalized_CPs.pdb
-
-    mv paths.txt \
-      pdi_terminal_functionalized_paths.txt
-
-    mv paths.pdb \
-      pdi_terminal_functionalized_paths.pdb
-
-    mv CPprop.txt \
-      pdi_terminal_functionalized_CPprop.txt
+```bash
+mv CPs.txt pdi_terminal_functionalized_CPs.txt
+mv CPs.pdb pdi_terminal_functionalized_CPs.pdb
+mv paths.txt pdi_terminal_functionalized_paths.txt
+mv paths.pdb pdi_terminal_functionalized_paths.pdb
+mv CPprop.txt pdi_terminal_functionalized_CPprop.txt
+```
 
 The triangle-centre search may require more time for the 70-atom structure.
 
@@ -1330,90 +1384,113 @@ Both functions are dimensionless.
 
 Enter:
 
-    cd "$PDI/elf_lol"
-
-    "$MWFN" "$PDI_WFN" 2>&1 | tee pdi_elf.session.log
+```bash
+cd "$PDI/elf_lol"
+"$MWFN" "$PDI_WFN" 2>&1 | tee pdi_elf.session.log
+```
 
 Use:
 
-    5
-    9
-    2
+```text
+5
+9
+2
+2
+0
+q
+```
 
-At the post-processing menu, select:
-
-    2
-
-to export the cube file.
-
-Return to the main menu and quit.
+This selects grid-data analysis, ELF, the medium-quality grid, exports `ELF.cub`, returns to the main menu, and exits.
 
 Inspect:
 
-    ls -lt *.cub
+```bash
+ls -lt *.cub
+```
 
 Rename:
 
-    mv <generated_ELF_cube>.cub pdi_elf.cub
+```bash
+mv ELF.cub pdi_elf.cub
+```
 
 ### 4.7.2 Parent PDI LOL
 
 Run:
 
-    "$MWFN" "$PDI_WFN" 2>&1 | tee pdi_lol.session.log
+```bash
+"$MWFN" "$PDI_WFN" 2>&1 | tee pdi_lol.session.log
+```
 
 Use:
 
-    5
-    10
-    2
-    2
-
-Return to the main menu and quit.
+```text
+5
+10
+2
+2
+0
+q
+```
 
 Rename:
 
-    mv <generated_LOL_cube>.cub pdi_lol.cub
+```bash
+mv LOL.cub pdi_lol.cub
+```
 
 ### 4.7.3 Terminal-functionalized PDI ELF
 
 Enter:
 
-    cd "$TFPDI/elf_lol"
-
-    "$MWFN" "$TFPDI_WFN" 2>&1 \
-      | tee pdi_terminal_functionalized_elf.session.log
+```bash
+cd "$TFPDI/elf_lol"
+"$MWFN" "$TFPDI_WFN" 2>&1 \
+  | tee pdi_terminal_functionalized_elf.session.log
+```
 
 Use:
 
-    5
-    9
-    2
-    2
+```text
+5
+9
+2
+2
+0
+q
+```
 
 Rename:
 
-    mv <generated_ELF_cube>.cub \
-      pdi_terminal_functionalized_elf.cub
+```bash
+mv ELF.cub pdi_terminal_functionalized_elf.cub
+```
 
 ### 4.7.4 Terminal-functionalized PDI LOL
 
 Run:
 
-    "$MWFN" "$TFPDI_WFN" 2>&1 \
-      | tee pdi_terminal_functionalized_lol.session.log
+```bash
+"$MWFN" "$TFPDI_WFN" 2>&1 \
+  | tee pdi_terminal_functionalized_lol.session.log
+```
 
 Use:
 
-    5
-    10
-    2
-    2
+```text
+5
+10
+2
+2
+0
+q
+```
 
 Rename:
 
-    mv <generated_LOL_cube>.cub \
-      pdi_terminal_functionalized_lol.cub
+```bash
+mv LOL.cub pdi_terminal_functionalized_lol.cub
+```
 
 The ELF and LOL analyses can illustrate:
 
@@ -1444,114 +1521,125 @@ A later, more chemically informative analysis can divide the terminal-functional
 
 Move to the repository root:
 
-    cd "$REPO"
+```bash
+cd "$REPO"
+```
 
 Create:
 
-    cat > scripts/list_molden_atoms.py <<'PY'
-    #!/usr/bin/env python3
+```bash
+mkdir -p scripts
+cat > scripts/list_molden_atoms.py <<'PY'
+#!/usr/bin/env python3
 
-    from __future__ import annotations
+from __future__ import annotations
 
-    import sys
-    from collections import defaultdict
-    from pathlib import Path
+import sys
+from collections import defaultdict
+from pathlib import Path
 
 
-    def compress_ranges(indices: list[int]) -> str:
-        if not indices:
-            return ""
+def compress_ranges(indices: list[int]) -> str:
+    if not indices:
+        return ""
 
-        ranges: list[str] = []
-        start = previous = indices[0]
+    ranges: list[str] = []
+    start = previous = indices[0]
 
-        for value in indices[1:]:
-            if value == previous + 1:
-                previous = value
-                continue
-
-            ranges.append(
-                str(start) if start == previous else f"{start}-{previous}"
-            )
-            start = previous = value
+    for value in indices[1:]:
+        if value == previous + 1:
+            previous = value
+            continue
 
         ranges.append(
             str(start) if start == previous else f"{start}-{previous}"
         )
+        start = previous = value
 
-        return ",".join(ranges)
+    ranges.append(
+        str(start) if start == previous else f"{start}-{previous}"
+    )
 
-
-    def read_atoms(path: Path) -> dict[str, list[int]]:
-        groups: dict[str, list[int]] = defaultdict(list)
-        in_atoms = False
-
-        with path.open(encoding="utf-8", errors="replace") as handle:
-            for raw_line in handle:
-                line = raw_line.strip()
-
-                if line.lower().startswith("[atoms]"):
-                    in_atoms = True
-                    continue
-
-                if in_atoms and line.startswith("["):
-                    break
-
-                if not in_atoms or not line:
-                    continue
-
-                fields = line.split()
-
-                if len(fields) < 2:
-                    continue
-
-                symbol = fields[0]
-                atom_index = int(fields[1])
-                groups[symbol].append(atom_index)
-
-        return dict(groups)
+    return ",".join(ranges)
 
 
-    def main() -> None:
-        if len(sys.argv) != 2:
-            raise SystemExit(
-                "Usage: list_molden_atoms.py FILE.molden.input"
-            )
+def read_atoms(path: Path) -> dict[str, list[int]]:
+    groups: dict[str, list[int]] = defaultdict(list)
+    in_atoms = False
 
-        path = Path(sys.argv[1]).expanduser().resolve()
+    with path.open(encoding="utf-8", errors="replace") as handle:
+        for raw_line in handle:
+            line = raw_line.strip()
 
-        if not path.is_file():
-            raise SystemExit(f"File not found: {path}")
+            if line.lower().startswith("[atoms]"):
+                in_atoms = True
+                continue
 
-        groups = read_atoms(path)
+            if in_atoms and line.startswith("["):
+                break
 
-        print(f"File: {path}")
-        print()
+            if not in_atoms or not line:
+                continue
 
-        for element, indices in groups.items():
-            print(f"{element:>2}: {compress_ranges(indices)}")
+            fields = line.split()
+
+            if len(fields) < 2:
+                continue
+
+            symbol = fields[0]
+            atom_index = int(fields[1])
+            groups[symbol].append(atom_index)
+
+    return dict(groups)
 
 
-    if __name__ == "__main__":
-        main()
-    PY
+def main() -> None:
+    if len(sys.argv) != 2:
+        raise SystemExit(
+            "Usage: list_molden_atoms.py FILE.molden.input"
+        )
+
+    path = Path(sys.argv[1]).expanduser().resolve()
+
+    if not path.is_file():
+        raise SystemExit(f"File not found: {path}")
+
+    groups = read_atoms(path)
+
+    print(f"File: {path}")
+    print()
+
+    for element, indices in groups.items():
+        print(f"{element:>2}: {compress_ranges(indices)}")
+
+
+if __name__ == "__main__":
+    main()
+PY
+```
 
 Make it executable:
 
-    chmod +x scripts/list_molden_atoms.py
+```bash
+chmod +x scripts/list_molden_atoms.py
+```
 
 Generate the atom-group lists:
 
-    python3 scripts/list_molden_atoms.py "$PDI_WFN" \
-      | tee "$PDI/dos/atom_groups.txt"
+```bash
+python3 scripts/list_molden_atoms.py "$PDI_WFN" \
+  | tee "$PDI/dos/atom_groups.txt"
 
-    python3 scripts/list_molden_atoms.py "$TFPDI_WFN" \
-      | tee "$TFPDI/dos/atom_groups.txt"
+python3 scripts/list_molden_atoms.py "$TFPDI_WFN" \
+  | tee "$TFPDI/dos/atom_groups.txt"
+```
 
 Inspect:
 
-    cat "$PDI/dos/atom_groups.txt"
-    cat "$TFPDI/dos/atom_groups.txt"
+```bash
+cat "$PDI/dos/atom_groups.txt"
+cat "$TFPDI/dos/atom_groups.txt"
+```
 
 Use these generated atom lists rather than manually guessing atom indices.
 
@@ -1559,92 +1647,186 @@ Use these generated atom lists rather than manually guessing atom indices.
 
 Enter:
 
-    cd "$PDI/dos"
-
-    "$MWFN" "$PDI_WFN" 2>&1 | tee pdi_dos.session.log
+```bash
+cd "$PDI/dos"
+"$MWFN" "$PDI_WFN" 2>&1 | tee pdi_dos.session.log
+```
 
 At the main menu, enter:
 
-    10
+```text
+10
+```
 
-In the DOS menu, configure:
+In the DOS menu, configure the unit, energy range and FWHM with:
 
-    Energy unit: eV
-    Energy range: -12 to 4 eV
-    Broadening function: Gaussian
-    FWHM: 0.30 eV
+```text
+8
+2
+-12 4 0.05
+3
+0.30
+```
 
-Open the fragment-definition menu.
+This selects eV units, an energy range of `-12` to `4` eV, a step of `0.05` eV, Gaussian broadening, and FWHM `0.30` eV.
 
-Define:
+Open the fragment-definition menu and define element fragments:
 
-    Fragment 1: all carbon atoms
-    Fragment 2: all nitrogen atoms
-    Fragment 3: all oxygen atoms
-    Fragment 4: all hydrogen atoms
+```text
+-1
+1
+e C
+q
+2
+e N
+q
+3
+e O
+q
+4
+e H
+q
+e
+0
+```
 
-Copy the corresponding atom-index lists from:
+This enters fragment definition, defines fragments 1-4 using element selectors, saves each fragment with `q` inside the fragment editor, exports `DOSfrag.txt` with `e`, and returns to the DOS menu with `0`.
 
-    atom_groups.txt
+The element selectors should match the atom groups in:
+
+```text
+atom_groups.txt
+```
 
 For the initial demonstration, retain the default Mulliken orbital-composition method.
 
-Generate the TDOS and fragment PDOS curves.
+Generate the TDOS and fragment PDOS curves and export the numeric data:
 
-Export the curve data to text files.
+```text
+-0
+3
+0
+-10
+q
+```
+
+This draws TDOS+PDOS, exports curve and discrete-line data to text files, returns to the DOS menu, returns to the main menu, and exits.
+
+Multiwfn 3.8 exports:
+
+```text
+DOSfrag.txt
+DOS_curve.txt
+DOS_line.txt
+```
+
+It does not automatically split the output into separate `*_tdos.txt` or `*_pdos_*.txt` files. `DOS_curve.txt` contains the energy column, TDOS, OPDOS, and PDOS columns for fragments 1-10. `DOS_line.txt` contains the corresponding discrete orbital-line data.
 
 Rename the outputs descriptively:
 
-    pdi_tdos.txt
-    pdi_pdos_C.txt
-    pdi_pdos_N.txt
-    pdi_pdos_O.txt
-    pdi_pdos_H.txt
+```bash
+mv DOSfrag.txt pdi_DOSfrag.txt
+mv DOS_curve.txt pdi_dos_curve.txt
+mv DOS_line.txt pdi_dos_line.txt
+```
+
+If the generated filenames differ between Multiwfn versions, inspect the directory first:
+
+```bash
+ls -lh
+```
 
 Record the settings:
 
-    cat > pdi_dos_settings.txt <<'EOF'
-    Energy unit: eV
-    Energy range: -12 to 4 eV
-    Broadening: Gaussian
-    FWHM: 0.30 eV
-    Projection fragments: C, N, O and H
-    Orbital-composition method: Mulliken
-    EOF
+```bash
+cat > pdi_dos_settings.txt <<'EOF'
+Energy unit: eV
+Energy range: -12 to 4 eV
+Step: 0.05 eV
+Broadening: Gaussian
+FWHM: 0.30 eV
+Projection fragments: C, N, O and H
+Orbital-composition method: Mulliken
+Multiwfn numeric exports: DOS_curve.txt, DOS_line.txt, DOSfrag.txt
+EOF
+```
+
+DISLIN/PDF export through the plotting menu may fail or may produce a file with a version-dependent `dislin` prefix. Treat the text export from post-processing option `3` as the reproducible result.
 
 ### 4.8.3 Terminal-functionalized PDI DOS and element PDOS
 
 Enter:
 
-    cd "$TFPDI/dos"
-
-    cat atom_groups.txt
+```bash
+cd "$TFPDI/dos"
+cat atom_groups.txt
+```
 
 Run:
 
-    "$MWFN" "$TFPDI_WFN" 2>&1 \
-      | tee pdi_terminal_functionalized_dos.session.log
+```bash
+"$MWFN" "$TFPDI_WFN" 2>&1 \
+  | tee pdi_terminal_functionalized_dos.session.log
+```
 
 At the main menu, enter:
 
-    10
+```text
+10
+```
 
 Use exactly the same DOS settings:
 
-    Energy unit: eV
-    Energy range: -12 to 4 eV
-    Broadening function: Gaussian
-    FWHM: 0.30 eV
-    Projection fragments: C, N, O and H
-    Orbital-composition method: Mulliken
+```text
+8
+2
+-12 4 0.05
+3
+0.30
+-1
+1
+e C
+q
+2
+e N
+q
+3
+e O
+q
+4
+e H
+q
+e
+0
+-0
+3
+0
+-10
+q
+```
 
 Export and rename:
 
-    pdi_terminal_functionalized_tdos.txt
-    pdi_terminal_functionalized_pdos_C.txt
-    pdi_terminal_functionalized_pdos_N.txt
-    pdi_terminal_functionalized_pdos_O.txt
-    pdi_terminal_functionalized_pdos_H.txt
+```bash
+mv DOSfrag.txt pdi_terminal_functionalized_DOSfrag.txt
+mv DOS_curve.txt pdi_terminal_functionalized_dos_curve.txt
+mv DOS_line.txt pdi_terminal_functionalized_dos_line.txt
+```
+
+Record the settings:
+
+```bash
+cat > pdi_terminal_functionalized_dos_settings.txt <<'EOF'
+Energy unit: eV
+Energy range: -12 to 4 eV
+Step: 0.05 eV
+Broadening: Gaussian
+FWHM: 0.30 eV
+Projection fragments: C, N, O and H
+Orbital-composition method: Mulliken
+Multiwfn numeric exports: DOS_curve.txt, DOS_line.txt, DOSfrag.txt
+EOF
+```
 
 Because the functionalized molecule contains more atoms and molecular orbitals, its absolute TDOS intensity will naturally be larger.
 
@@ -1660,42 +1842,45 @@ For final comparison figures, either:
 
 After completing Sections 4.1–4.8, each analysis folder should contain files resembling:
 
-    multiwfn_analysis/
-    ├── wavefunction_validation/
-    │   └── *_validation.session.log
-    ├── orbitals/
-    │   ├── *_homo.cub
-    │   ├── *_lumo.cub
-    │   └── *.session.log
-    ├── charges/
-    │   ├── *_hirshfeld.chg
-    │   └── *_hirshfeld.session.log
-    ├── esp/
-    │   ├── *_density.cub
-    │   ├── *_esp.cub
-    │   ├── *_esp_surface_statistics.txt
-    │   ├── *_esp_extrema.pdb
-    │   └── *.session.log
-    ├── bond_orders/
-    │   ├── *_mayer_bond_orders.txt
-    │   └── *_mayer.session.log
-    ├── qtaim/
-    │   ├── *_CPs.txt
-    │   ├── *_CPs.pdb
-    │   ├── *_paths.txt
-    │   ├── *_paths.pdb
-    │   ├── *_CPprop.txt
-    │   └── *_qtaim.session.log
-    ├── elf_lol/
-    │   ├── *_elf.cub
-    │   ├── *_lol.cub
-    │   └── *.session.log
-    └── dos/
-        ├── atom_groups.txt
-        ├── *_tdos.txt
-        ├── *_pdos_*.txt
-        ├── *_dos_settings.txt
-        └── *_dos.session.log
+```text
+multiwfn_analysis/
+├── wavefunction_validation/
+│   └── *_validation.session.log
+├── orbitals/
+│   ├── *_homo.cub
+│   ├── *_lumo.cub
+│   └── *.session.log
+├── charges/
+│   ├── *_hirshfeld.chg
+│   └── *_hirshfeld.session.log
+├── esp/
+│   ├── *_density.cub
+│   ├── *_esp.cub
+│   ├── *_esp_surface_statistics.txt
+│   ├── *_esp_extrema.pdb
+│   └── *.session.log
+├── bond_orders/
+│   ├── *_mayer_bond_orders.txt
+│   └── *_mayer.session.log
+├── qtaim/
+│   ├── *_CPs.txt
+│   ├── *_CPs.pdb
+│   ├── *_paths.txt
+│   ├── *_paths.pdb
+│   ├── *_CPprop.txt
+│   └── *_qtaim.session.log
+├── elf_lol/
+│   ├── *_elf.cub
+│   ├── *_lol.cub
+│   └── *.session.log
+└── dos/
+    ├── atom_groups.txt
+    ├── *_DOSfrag.txt
+    ├── *_dos_curve.txt
+    ├── *_dos_line.txt
+    ├── *_dos_settings.txt
+    └── *_dos.session.log
+```
 
 Large regenerable files such as `.cub`, `.gbw` and `.molden.input` files may be excluded from ordinary Git tracking or managed using Git LFS.
 
@@ -1712,6 +1897,6 @@ The Multiwfn stage is complete when:
 5. Mayer bond-order matrices have been exported;
 6. QTAIM critical points and bond paths have been generated;
 7. ELF and LOL cubes have been generated;
-8. TDOS and fragment PDOS data have been exported;
+8. TDOS and fragment PDOS data have been exported as `*_dos_curve.txt`, `*_dos_line.txt` and `*_DOSfrag.txt`;
 9. all comparison plots use consistent axes, colour scales, orientations and isovalues;
 10. all menu selections, software versions and analysis settings are preserved in session logs or settings files.
