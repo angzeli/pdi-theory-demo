@@ -1,0 +1,3 @@
+system,source_file,formula,atoms,electrons,basis_functions,occupied_orbitals,homo_index,lumo_index,multiwfn_version,wavefunction_type
+pdi,calculations/pdi/multiwfn_analysis/wavefunction_validation/pdi_validation.session.log,H10 C24 N2 O4      Total atoms:      40,40,200,990,,,,,
+pdi_terminal_functionalized,calculations/pdi_terminal_functionalized/multiwfn_analysis/wavefunction_validation/pdi_terminal_functionalized_validation.session.log,H30 C34 N2 O4      Total atoms:      70,70,280,1420,,,,,

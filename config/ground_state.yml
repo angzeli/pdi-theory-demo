@@ -1,0 +1,30 @@
+systems:
+  pdi:
+    label: Parent PDI
+    root: calculations/pdi/multiwfn_analysis
+
+  pdi_terminal_functionalized:
+    label: Terminal-functionalized PDI
+    root: calculations/pdi_terminal_functionalized/multiwfn_analysis
+
+settings:
+  orbital_isovalue: 0.03
+  density_isovalue: 0.001
+  elf_isovalue: 0.80
+  lol_isovalue: 0.50
+  dos_energy_min_ev: -12.0
+  dos_energy_max_ev: 4.0
+  dos_fwhm_ev: 0.30
+
+fragments:
+  pdi:
+    core: []
+    carbonyl_oxygen: []
+    imide_nitrogen: []
+
+  pdi_terminal_functionalized:
+    core: []
+    terminal_left: []
+    terminal_right: []
+    carbonyl_oxygen: []
+    imide_nitrogen: []

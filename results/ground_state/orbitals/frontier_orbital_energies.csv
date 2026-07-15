@@ -1,0 +1,3 @@
+system,homo_index,lumo_index,homo_energy_au,lumo_energy_au,homo_energy_ev,lumo_energy_ev,gap_ev,source_file
+pdi,100,101,-0.3040873500213,-0.0826222887925731,-8.274638333948541,-2.2482670128622724,6.026371321086269,calculations/pdi/multiwfn_analysis/pdi_sp.molden.input
+pdi_terminal_functionalized,140,141,-0.296534074171229,-0.0757282343322233,-8.069103227369766,-2.060670234140817,6.008432993228949,calculations/pdi_terminal_functionalized/multiwfn_analysis/pdi_terminal_functionalized_sp.molden.input

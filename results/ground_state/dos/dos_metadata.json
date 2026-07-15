@@ -1,0 +1,26 @@
+{
+  "pdi": {
+    "energy_unit": "eV",
+    "broadening": "Gaussian",
+    "projection_method": "Mulliken",
+    "energy_min_ev": -12.0,
+    "energy_max_ev": 4.0,
+    "energy_step_ev": 0.1,
+    "fwhm_ev": 0.3,
+    "curve_file": "calculations/pdi/multiwfn_analysis/dos/pdi_dos_curve.txt",
+    "line_file": "calculations/pdi/multiwfn_analysis/dos/pdi_dos_line.txt",
+    "fragment_file": "calculations/pdi/multiwfn_analysis/dos/pdi_DOSfrag.txt"
+  },
+  "pdi_terminal_functionalized": {
+    "energy_unit": "",
+    "broadening": "",
+    "projection_method": "",
+    "energy_min_ev": "",
+    "energy_max_ev": "",
+    "energy_step_ev": "",
+    "fwhm_ev": "",
+    "curve_file": "calculations/pdi_terminal_functionalized/multiwfn_analysis/dos/pdi_terminal_functionalized_dos_curve.txt",
+    "line_file": "calculations/pdi_terminal_functionalized/multiwfn_analysis/dos/pdi_terminal_functionalized_dos_line.txt",
+    "fragment_file": "calculations/pdi_terminal_functionalized/multiwfn_analysis/dos/pdi_terminal_functionalized_DOSfrag.txt"
+  }
+}
