@@ -22,33 +22,61 @@ This project aims to:
 ## 🛠️ Planned Workflow
 
 ```text
-Molecular Structure
+    ChemDraw & Avogadro
         │
-        ├── ChemDraw
-        └── Avogadro
-        │
-        ▼
-      ORCA
+        3D Molecular Structure
         │
         ▼
-Optimized Wavefunction
+    ORCA ground-state calculations
+        │
+        ├── Geometry optimization
+        ├── Frequency validation
+        └── Higher-level single-point calculation
         │
         ▼
-    Multiwfn
+    Ground-state Multiwfn
         │
         ├── HOMO / LUMO
+        ├── Hirshfeld charges       
         ├── ESP
-        ├── Charges
-        ├── DOS
-        ├── NCI
-        └── TD-DFT Analysis
+        ├── Mayer bond orders
+        ├── QTAIM topology
+        ├── ELF and LOL
+        └── DOS, PDOS, OPDOS
         │
         ▼
-      Python
+    Python, VMD, IQmol, Powerpoint post-processing
         │
         ├── Data parsing
         ├── Plotting
-        ├── Figure generation
+        ├── Figure generation and combination
+        └── Report automation
+        │
+        ▼
+    ORCA follow-up calculations
+        │
+        ├── TD-DFT Analysis
+        ├── Charged states
+        ├── Adsorption complexes
+        ├── Reaction intermediates
+        └── Transition states where justified
+        │
+        ▼
+    Multiwfn follow-up analysis
+        │
+        ├── NTO analysis
+        ├── Hole–electron analysis
+        ├── Fukui functions
+        ├── NCI / IGMH
+        ├── Charge-density difference
+        └── Fragment charge transfer
+        │
+        ▼
+    Python, VMD, IQmol, Powerpoint post-processing
+        │
+        ├── Data parsing
+        ├── Plotting
+        ├── Figure generation and combination
         └── Report automation
 ```
 
