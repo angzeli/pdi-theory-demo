@@ -1,0 +1,17 @@
+system,analysis_region,hirshfeld_charge
+pdi,carbonyl,-1.1317657381
+pdi,core,0.0621916008
+pdi,imide,0.14952844629999998
+pdi,middle,-0.022577923
+pdi,outer,0.9426236136
+pdi_terminal_functionalized,carbonyl,-1.0270834879
+pdi_terminal_functionalized,core,0.0549912008
+pdi_terminal_functionalized,imide,-0.048547837499999996
+pdi_terminal_functionalized,middle,-0.05135524140000001
+pdi_terminal_functionalized,outer,0.9507854074
+pdi_terminal_functionalized,terminal_left_alpha,0.0641727862
+pdi_terminal_functionalized,terminal_left_beta,0.011654804099999999
+pdi_terminal_functionalized,terminal_left_gamma,-0.015221320600000005
+pdi_terminal_functionalized,terminal_right_alpha,0.0641730812
+pdi_terminal_functionalized,terminal_right_beta,0.0116527285
+pdi_terminal_functionalized,terminal_right_gamma,-0.015222121000000005

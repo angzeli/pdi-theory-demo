@@ -1,0 +1,47 @@
+bond_id,label,parent_i,parent_j,functionalized_i,functionalized_j,comparison_type
+cc_1,C-C,1,2,1,2,matched
+cc_2,C-C,1,6,1,6,matched
+cc_3,C-C,1,20,1,20,matched
+cc_4,C-C,2,3,2,3,matched
+cc_5,C-C,2,7,2,7,matched
+cc_6,C-C,3,4,3,4,matched
+cc_7,C-C,3,10,3,10,matched
+cc_8,C-C,4,5,4,5,matched
+cc_9,C-C,4,13,4,13,matched
+cc_10,C-C,5,6,5,6,matched
+cc_11,C-C,5,14,5,14,matched
+cc_12,C-C,6,17,6,17,matched
+cc_13,C-C,7,8,7,8,matched
+cc_14,C-C,8,9,8,9,matched
+cc_15,C-C,9,10,9,10,matched
+cc_16,C-C,9,24,9,24,matched
+cc_17,C-C,10,11,10,11,matched
+cc_18,C-C,11,12,11,12,matched
+cc_19,C-C,11,26,11,26,matched
+cc_20,C-C,12,13,12,13,matched
+cc_21,C-C,14,15,14,15,matched
+cc_22,C-C,15,16,15,16,matched
+cc_23,C-C,16,17,16,17,matched
+cc_24,C-C,16,21,16,21,matched
+cc_25,C-C,17,18,17,18,matched
+cc_26,C-C,18,19,18,19,matched
+cc_27,C-C,18,23,18,23,matched
+cc_28,C-C,19,20,19,20,matched
+cn_1,C-N,21,22,21,22,matched
+co_1,C-O,21,29,21,29,matched
+nc_1,N-C,22,23,22,23,matched
+co_2,C-O,23,30,23,30,matched
+cn_2,C-N,24,25,24,25,matched
+co_3,C-O,24,27,24,27,matched
+nc_2,N-C,25,26,25,26,matched
+co_4,C-O,26,28,26,28,matched
+newnc_1,new N-C,,,22,31,functionalized_only
+newnc_2,new N-C,,,25,32,functionalized_only
+newcc_1,new C-C,,,31,33,functionalized_only
+newcc_2,new C-C,,,31,34,functionalized_only
+newcc_3,new C-C,,,32,37,functionalized_only
+newcc_4,new C-C,,,32,38,functionalized_only
+newcc_5,new C-C,,,33,36,functionalized_only
+newcc_6,new C-C,,,34,35,functionalized_only
+newcc_7,new C-C,,,37,39,functionalized_only
+newcc_8,new C-C,,,38,40,functionalized_only
