@@ -1963,3 +1963,98 @@ The postprocessing stage is complete when:
 3. `orbital_energies.csv` contains the full molecular-orbital energy table parsed from the Molden files;
 4. Hirshfeld charges, ESP extrema, Mayer bond orders, QTAIM data and DOS/PDOS curves have been written under `results/ground_state/`;
 5. any expected ESP warning is understood and documented rather than treated as a parser failure.
+
+## 6. Electronic structure analysis
+
+The electronic structure of the parent and terminal-functionalized PDI molecules is analysed using several complementary descriptors, including frontier molecular orbitals, Hirshfeld atomic charges, electrostatic potential (ESP), and Mayer bond orders. Together, these analyses provide a comprehensive picture of how terminal functionalization modifies the electronic distribution, intermolecular interaction characteristics, and chemical bonding within the PDI framework.
+
+### 6.1 Validation of parsed quantum-chemical data (`00_validate_parsed_data.ipynb`)
+
+Before performing any electronic structure analysis, all parsed quantum-chemical data are automatically validated to ensure consistency and completeness.
+
+The validation workflow verifies:
+
+- successful parsing of ORCA output files;
+- consistency between parsed orbital energies, atomic properties, and bond information;
+- preservation of atom ordering across all generated datasets;
+- completeness of generated CSV files required by downstream analyses.
+
+This validation step serves as a quality-control checkpoint before higher-level analyses are performed and helps identify parsing errors or incomplete calculations at an early stage.
+
+---
+
+### 6.2 Frontier molecular orbital analysis (`01_frontier_orbitals.ipynb`)
+
+Frontier molecular orbital (FMO) analysis is performed to investigate the spatial distribution and energetic characteristics of the HOMO and LUMO.
+
+The notebook automatically:
+
+- extracts HOMO/LUMO energies;
+- calculates the HOMO–LUMO gap;
+- compares orbital energies between the parent and functionalized molecules;
+- exports publication-ready orbital energy tables.
+
+The corresponding orbital wavefunctions are visualized using **IQmol**, which provides high-quality isosurface rendering suitable for publication.
+
+For each molecule, both the HOMO and LUMO are rendered using identical:
+
+- isovalue;
+- viewing angle;
+- molecular orientation;
+- rendering parameters.
+
+This enables direct visual comparison of orbital localization before and after terminal functionalization and facilitates interpretation of changes in electron delocalization and potential charge-transfer pathways.
+
+---
+
+### 6.3 Hirshfeld charge analysis (`02_hirshfeld_charges.ipynb`)
+
+Atomic charge redistribution induced by terminal functionalization is quantified using Hirshfeld population analysis.
+
+The workflow:
+
+- extracts Hirshfeld charges from ORCA calculations;
+- maps equivalent atoms between the parent and functionalized structures;
+- computes charge differences for each mapped atom;
+- summarizes charge redistribution within chemically meaningful regions.
+
+The resulting charge analysis reveals how electron density is redistributed between the PDI core and terminal substituents, providing quantitative insight into inductive and resonance effects introduced by functionalization.
+
+---
+
+### 6.4 Electrostatic potential analysis (`03_esp_analysis.ipynb`)
+
+Electrostatic potential (ESP) analysis is performed to visualize changes in surface electrostatic characteristics resulting from terminal functionalization.
+
+The notebook automatically:
+
+- parses ESP cube files;
+- determines consistent global colour scales;
+- prepares visualization inputs;
+- exports quantitative ESP statistics.
+
+The molecular electrostatic potential is mapped onto the electron-density isosurface using **VMD**, employing identical visualization settings for both systems, including:
+
+- identical density isovalue;
+- identical ESP colour scale;
+- identical molecular orientation;
+- identical rendering parameters.
+
+The resulting ESP maps allow direct comparison of electron-rich and electron-deficient regions, enabling qualitative assessment of how terminal functionalization modifies intermolecular interaction sites and surface polarity while preserving consistency between visualizations.
+
+---
+
+### 6.5 Mayer bond-order analysis (`04_mayer_bond_orders.ipynb`)
+
+Chemical bonding changes induced by terminal functionalization are investigated using Mayer bond-order analysis.
+
+The workflow automatically:
+
+- parses Mayer bond orders from ORCA calculations;
+- maps chemically equivalent bonds between the parent and functionalized molecules;
+- calculates bond-order differences;
+- generates publication-ready comparison figures.
+
+Representative chemically important bonds, including carbonyl C=O bonds, imide C–N bonds, and selected aromatic C–C bonds, are compared directly between the two systems.
+
+Both individual bond-order changes and bond-type summaries are generated, allowing identification of the bonding motifs most strongly affected by terminal functionalization. Ranking bonds by the magnitude of the Mayer bond-order change provides a concise visualization of the primary electronic perturbations introduced by functionalization while demonstrating that the conjugated PDI framework remains largely preserved.
