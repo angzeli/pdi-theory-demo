@@ -3,6 +3,7 @@
 
 # Local editor/project metadata
 .idea/
+261_24374_152-pycharm-support-libs/
 
 # ORCA transient scratch / interrupted-job artifacts
 *.tmp
