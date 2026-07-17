@@ -110,14 +110,14 @@ The charge and multiplicity must be changed for ions, radicals, triplet oxygen, 
 Use the validated ORCA launcher rather than invoking the ORCA binary directly:
 
 ```bash
-$HOME/bin/orca611 pdi_opt.inp > pdi_opt.out 2> pdi_opt.err
+$HOME/bin/orca611 pdi_tda_singlets.inp > pdi_opt.out 2> pdi_opt.err
 ```
 
 To prevent macOS from sleeping during a long job:
 
 ```bash
 caffeinate -i $HOME/bin/orca611 \
-  pdi_opt.inp > pdi_opt.out 2> pdi_opt.err
+  pdi_tda_singlets.inp > pdi_opt.out 2> pdi_opt.err
 ```
 
 Monitor the output in another Terminal window:
@@ -1966,7 +1966,21 @@ The postprocessing stage is complete when:
 
 ## 6. Electronic structure analysis
 
-The electronic structure of the parent and terminal-functionalized PDI molecules is analysed using several complementary descriptors, including frontier molecular orbitals, Hirshfeld atomic charges, electrostatic potential (ESP), and Mayer bond orders. Together, these analyses provide a comprehensive picture of how terminal functionalization modifies the electronic distribution, intermolecular interaction characteristics, and chemical bonding within the PDI framework.
+The electronic structure of the parent and terminal-functionalized PDI molecules is analysed using the notebooks in:
+
+```text
+analysis/
+```
+
+These notebooks use the parsed CSV files from section 5 and generate publication-ready figures under:
+
+```text
+figures/
+```
+
+Run the notebooks in numerical order, from `00_validate_parsed_data.ipynb` through `07_dos_pdos_opdos.ipynb`. The current validated analysis set contains notebooks `00` to `07`; there is no required `08_ground_state_summary.ipynb` notebook in the present workflow.
+
+Together, these analyses compare frontier molecular orbitals, Hirshfeld atomic charges, electrostatic potential (ESP), Mayer bond orders, QTAIM topology, ELF/LOL cube statistics and DOS/PDOS/OPDOS descriptors.
 
 ### 6.1 Validation of parsed quantum-chemical data (`00_validate_parsed_data.ipynb`)
 
@@ -1981,6 +1995,14 @@ The validation workflow verifies:
 
 This validation step serves as a quality-control checkpoint before higher-level analyses are performed and helps identify parsing errors or incomplete calculations at an early stage.
 
+The notebook reads the main parsed outputs under:
+
+```text
+results/ground_state/
+```
+
+and confirms that the expected parent and terminal-functionalized PDI records are present before the remaining notebooks are used.
+
 ---
 
 ### 6.2 Frontier molecular orbital analysis (`01_frontier_orbitals.ipynb`)
@@ -1994,9 +2016,22 @@ The notebook automatically:
 - compares orbital energies between the parent and functionalized molecules;
 - exports publication-ready orbital energy tables.
 
-The corresponding orbital wavefunctions are visualized using **IQmol**, which provides high-quality isosurface rendering suitable for publication.
+The notebook reads:
 
-For each molecule, both the HOMO and LUMO are rendered using identical:
+```text
+results/ground_state/orbitals/frontier_orbital_energies.csv
+results/ground_state/orbitals/orbital_energies.csv
+```
+
+and generates:
+
+```text
+figures/orbitals/fmo_energy_level_diagram.pdf
+figures/orbitals/fmo_energy_level_diagram.png
+figures/orbitals/fmo_combined_figure.tiff
+```
+
+The corresponding orbital wavefunctions are visualized using the exported orbital images. For each molecule, both the HOMO and LUMO should be rendered using identical:
 
 - isovalue;
 - viewing angle;
@@ -2018,6 +2053,23 @@ The workflow:
 - computes charge differences for each mapped atom;
 - summarizes charge redistribution within chemically meaningful regions.
 
+The notebook reads:
+
+```text
+results/ground_state/charges/hirshfeld_atomic_charges.csv
+config/pdi_core_atom_mapping.csv
+config/functionalized_atom_regions.csv
+```
+
+and generates:
+
+```text
+figures/hirshfeld_charges/matched_atom_hirshfeld_charge_comparison.pdf
+figures/hirshfeld_charges/matched_atom_hirshfeld_charge_comparison.png
+figures/hirshfeld_charges/matched_atom_hirshfeld_charge_shift.pdf
+figures/hirshfeld_charges/matched_atom_hirshfeld_charge_shift.png
+```
+
 The resulting charge analysis reveals how electron density is redistributed between the PDI core and terminal substituents, providing quantitative insight into inductive and resonance effects introduced by functionalization.
 
 ---
@@ -2032,6 +2084,34 @@ The notebook automatically:
 - determines consistent global colour scales;
 - prepares visualization inputs;
 - exports quantitative ESP statistics.
+
+The notebook reads:
+
+```text
+results/ground_state/esp/esp_surface_metrics.csv
+results/ground_state/esp/esp_extrema_from_text.csv
+results/ground_state/esp/esp_extrema_from_pdb.csv
+```
+
+and writes additional summary tables:
+
+```text
+results/ground_state/esp/esp_summary.csv
+results/ground_state/esp/top_10_esp_minima.csv
+results/ground_state/esp/top_10_esp_maxima.csv
+```
+
+The main exported figures are:
+
+```text
+figures/esp/global_surface_esp_extrema.pdf
+figures/esp/global_surface_esp_extrema.png
+figures/esp/ranked_surface_esp_minima.pdf
+figures/esp/ranked_surface_esp_minima.png
+figures/esp/ranked_surface_esp_maxima.pdf
+figures/esp/ranked_surface_esp_maxima.png
+figures/esp/esp_combined_figure.tiff
+```
 
 The molecular electrostatic potential is mapped onto the electron-density isosurface using **VMD**, employing identical visualization settings for both systems, including:
 
@@ -2055,6 +2135,182 @@ The workflow automatically:
 - calculates bond-order differences;
 - generates publication-ready comparison figures.
 
+The notebook reads:
+
+```text
+results/ground_state/bond_orders/mayer_bond_orders.csv
+config/selected_bonds_candidates.csv
+```
+
+and writes:
+
+```text
+results/ground_state/bond_orders/selected_mayer_bond_comparison.csv
+```
+
+The main exported figures are:
+
+```text
+figures/bond_orders/largest_selected_mayer_changes.pdf
+figures/bond_orders/largest_selected_mayer_changes.png
+```
+
 Representative chemically important bonds, including carbonyl C=O bonds, imide C–N bonds, and selected aromatic C–C bonds, are compared directly between the two systems.
 
 Both individual bond-order changes and bond-type summaries are generated, allowing identification of the bonding motifs most strongly affected by terminal functionalization. Ranking bonds by the magnitude of the Mayer bond-order change provides a concise visualization of the primary electronic perturbations introduced by functionalization while demonstrating that the conjugated PDI framework remains largely preserved.
+
+---
+
+### 6.6 QTAIM topology and bond-critical-point analysis (`05_qtaim_analysis.ipynb`)
+
+QTAIM analysis is used to validate the topology of the electron density and compare bond-critical-point (BCP) descriptors between matched bonds in the parent and terminal-functionalized PDI frameworks.
+
+The notebook reads:
+
+```text
+results/ground_state/qtaim/critical_points.csv
+results/ground_state/qtaim/critical_point_properties.csv
+results/ground_state/qtaim/bond_path_points.csv
+config/pdi_core_atom_mapping.csv
+config/selected_bonds_candidates.csv
+```
+
+The workflow:
+
+- counts nuclear, bond and ring critical points;
+- checks the Poincare-Hopf topology relation;
+- summarizes BCP electron density and Laplacian distributions;
+- matches BCPs through connected atom pairs rather than only by critical-point index;
+- compares matched BCP descriptors for chemically selected bonds.
+
+The notebook writes:
+
+```text
+results/ground_state/qtaim/topology_check.csv
+results/ground_state/qtaim/qtaim_bcp_summary.csv
+results/ground_state/qtaim/matched_bcp_comparison.csv
+results/ground_state/qtaim/matched_bcp_class_summary.csv
+```
+
+and generates:
+
+```text
+figures/qtaim/critical_point_counts.pdf
+figures/qtaim/critical_point_counts.png
+figures/qtaim/bcp_electron_density_distribution.pdf
+figures/qtaim/bcp_electron_density_distribution.png
+figures/qtaim/bcp_laplacian_distribution.pdf
+figures/qtaim/bcp_laplacian_distribution.png
+figures/qtaim/matched_bcp_electron_density_scatter.pdf
+figures/qtaim/matched_bcp_electron_density_scatter.png
+figures/qtaim/matched_bcp_electron_density_change.pdf
+figures/qtaim/matched_bcp_electron_density_change.png
+figures/qtaim/matched_bcp_laplacian_change.pdf
+figures/qtaim/matched_bcp_laplacian_change.png
+```
+
+Use the matched BCP figures to interpret local bonding changes only for bonds that are explicitly paired by the notebook. Unmatched terminal substituent bonds should be treated as functionalization-specific features rather than one-to-one perturbations of parent PDI bonds.
+
+---
+
+### 6.7 ELF and LOL cube analysis (`06_elf_lol_analysis.ipynb`)
+
+ELF and LOL cube analysis compares electron-localization descriptors from the Multiwfn-generated cube files.
+
+The notebook reads:
+
+```text
+results/ground_state/cubes/cube_metadata.csv
+```
+
+and loads the ELF/LOL cube files from the ground-state analysis folders, including:
+
+```text
+calculations/pdi/multiwfn_analysis/ground_state/elf_lol/
+calculations/pdi_terminal_functionalized/multiwfn_analysis/ground_state/elf_lol/
+```
+
+The workflow:
+
+- loads ELF and LOL volumetric grids;
+- computes grid-level summary statistics;
+- plots normalized voxel histograms;
+- plots cumulative distribution functions;
+- exports percentile tables;
+- generates central z-slice visualizations for qualitative comparison.
+
+The notebook writes:
+
+```text
+results/ground_state/cubes/elf_lol_summary.csv
+results/ground_state/cubes/elf_lol_percentiles.csv
+```
+
+and generates:
+
+```text
+figures/elf_lol/pdi_elf_central_slice.pdf
+figures/elf_lol/pdi_elf_central_slice.png
+figures/elf_lol/pdi_lol_central_slice.pdf
+figures/elf_lol/pdi_lol_central_slice.png
+figures/elf_lol/pdi_terminal_functionalized_elf_central_slice.pdf
+figures/elf_lol/pdi_terminal_functionalized_elf_central_slice.png
+figures/elf_lol/pdi_terminal_functionalized_lol_central_slice.pdf
+figures/elf_lol/pdi_terminal_functionalized_lol_central_slice.png
+```
+
+The histogram and CDF plots are quantitative comparisons of all grid voxels. The central-slice figures are qualitative two-dimensional views and should be interpreted together with the percentile summaries.
+
+---
+
+### 6.8 DOS, PDOS and OPDOS analysis (`07_dos_pdos_opdos.ipynb`)
+
+DOS, PDOS and OPDOS analysis compares the electronic-state distributions of the parent and terminal-functionalized molecules.
+
+The notebook reads:
+
+```text
+results/ground_state/dos/dos_curves.csv
+results/ground_state/dos/dos_lines.csv
+results/ground_state/orbitals/frontier_orbital_energies.csv
+```
+
+The workflow:
+
+- verifies that the DOS curves and line spectra were parsed correctly;
+- plots total DOS and projected DOS for each molecule;
+- aligns total DOS curves relative to the HOMO energy;
+- normalizes selected comparisons by atom count where appropriate;
+- prepares an analysis-ready DOS table for downstream reuse.
+
+The notebook writes:
+
+```text
+results/ground_state/dos/dos_analysis_ready.csv
+```
+
+and generates:
+
+```text
+figures/dos/pdi_tdos_pdos.pdf
+figures/dos/pdi_tdos_pdos.png
+figures/dos/pdi_terminal_functionalized_tdos_pdos.pdf
+figures/dos/pdi_terminal_functionalized_tdos_pdos.png
+figures/dos/tdos_comparison_homo_aligned_per_atom.pdf
+figures/dos/tdos_comparison_homo_aligned_per_atom.png
+```
+
+The HOMO-aligned comparison is the most useful plot for comparing changes in electronic-state distribution because it removes the absolute orbital-energy offset and emphasizes changes relative to the frontier level.
+
+---
+
+### 6.9 Completion criteria
+
+The electronic structure analysis stage is complete when:
+
+1. notebooks `00_validate_parsed_data.ipynb` through `07_dos_pdos_opdos.ipynb` run without errors;
+2. every expected figure folder is populated under `figures/`;
+3. the additional analysis tables are present under `results/ground_state/`;
+4. QTAIM matched BCP comparisons use connected-atom matching rather than critical-point order alone;
+5. ELF/LOL statistics are reported from the actual cube grids rather than only from rendered images;
+6. DOS comparisons include both system-specific TDOS/PDOS figures and the HOMO-aligned per-atom TDOS comparison.
