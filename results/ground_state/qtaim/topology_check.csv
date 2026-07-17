@@ -1,0 +1,3 @@
+system,system_label,nuclear_cp,bond_cp,ring_cp,cage_cp,poincare_hopf_value,passes
+pdi,Parent PDI,40,48,9,0,1,True
+pdi_terminal_functionalized,Functionalized PDI,70,84,15,0,1,True

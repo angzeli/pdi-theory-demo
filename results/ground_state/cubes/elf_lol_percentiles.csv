@@ -1,0 +1,53 @@
+system,cube_type,statistic,value
+pdi,elf,minimum,4.23746e-60
+pdi,elf,1st percentile,3.0017652000000017e-43
+pdi,elf,5th percentile,1.0364425000000006e-30
+pdi,elf,10th percentile,4.0410770000000034e-23
+pdi,elf,25th percentile,1.4523375000000002e-13
+pdi,elf,median,4.715365e-06
+pdi,elf,75th percentile,0.024542275
+pdi,elf,90th percentile,0.4137486000000002
+pdi,elf,95th percentile,0.6542036999999998
+pdi,elf,99th percentile,0.9152797599999998
+pdi,elf,maximum,0.999945
+pdi,elf,mean,0.0917229368631691
+pdi,elf,standard deviation,0.21314187064508125
+pdi,lol,minimum,5.57193e-15
+pdi,lol,1st percentile,1.6856585000000013e-11
+pdi,lol,5th percentile,6.742256000000001e-09
+pdi,lol,10th percentile,2.8215010000000007e-07
+pdi,lol,25th percentile,4.0304825e-05
+pdi,lol,median,0.0022992999999999998
+pdi,lol,75th percentile,0.035702975
+pdi,lol,90th percentile,0.19914610000000002
+pdi,lol,95th percentile,0.3515735499999999
+pdi,lol,99th percentile,0.55432
+pdi,lol,maximum,0.932704
+pdi,lol,mean,0.05494975040154414
+pdi,lol,standard deviation,0.12017755832818627
+pdi_terminal_functionalized,elf,minimum,5.34782e-75
+pdi_terminal_functionalized,elf,1st percentile,3.8494123000000045e-52
+pdi_terminal_functionalized,elf,5th percentile,8.286069500000008e-42
+pdi_terminal_functionalized,elf,10th percentile,9.474393e-36
+pdi_terminal_functionalized,elf,25th percentile,1.38337e-24
+pdi_terminal_functionalized,elf,median,7.09361e-13
+pdi_terminal_functionalized,elf,75th percentile,0.00019430675
+pdi_terminal_functionalized,elf,90th percentile,0.16106320000000218
+pdi_terminal_functionalized,elf,95th percentile,0.5650703499999998
+pdi_terminal_functionalized,elf,99th percentile,0.9505545399999997
+pdi_terminal_functionalized,elf,maximum,0.999927
+pdi_terminal_functionalized,elf,mean,0.06160995306825427
+pdi_terminal_functionalized,elf,standard deviation,0.189608635072876
+pdi_terminal_functionalized,lol,minimum,4.92066e-18
+pdi_terminal_functionalized,lol,1st percentile,2.5746235000000004e-13
+pdi_terminal_functionalized,lol,5th percentile,3.7094185000000003e-11
+pdi_terminal_functionalized,lol,10th percentile,7.004409000000001e-10
+pdi_terminal_functionalized,lol,25th percentile,1.6878849999999998e-07
+pdi_terminal_functionalized,lol,median,6.528474999999999e-05
+pdi_terminal_functionalized,lol,75th percentile,0.00677229
+pdi_terminal_functionalized,lol,90th percentile,0.09807141000000018
+pdi_terminal_functionalized,lol,95th percentile,0.23725805
+pdi_terminal_functionalized,lol,99th percentile,0.5063641499999998
+pdi_terminal_functionalized,lol,maximum,0.967875
+pdi_terminal_functionalized,lol,mean,0.03356880406226227
+pdi_terminal_functionalized,lol,standard deviation,0.09787571399582445
