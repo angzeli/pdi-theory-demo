@@ -55,6 +55,7 @@ This project aims to:
         ▼
     ORCA follow-up calculations
         │
+        ├── TDA
         ├── TD-DFT Analysis
         ├── Charged states
         ├── Adsorption complexes
