@@ -4,6 +4,11 @@
 # Local editor/project metadata
 .idea/
 261_24374_152-pycharm-support-libs/
+anaconda_projects/
+
+# Python caches
+__pycache__/
+*.py[cod]
 
 # ORCA transient scratch / interrupted-job artifacts
 *.tmp
@@ -15,9 +20,15 @@
 *.SHARK.KPRSCR.tmp
 *.hostnames
 *.bas[0-9]*
+*.bak.*
+*.pid
+nohup.out
 
 # Interrupted validation frequency run; keep out of validation evidence commit
 calculations/orca_mpi_validation_20260713-2220/pdi_freq_pal4/
 
 # Presentation exports
 *.pptx
+
+# Regenerable oversized parsed transition table
+results/excited_state/tda_uv_vis/excitation_transitions.csv
