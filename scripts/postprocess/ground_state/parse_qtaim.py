@@ -30,9 +30,19 @@ def parse_props(path):
         s=line.strip(); h=re.search(r'(?:CP|critical point)\s*#?\s*(\d+)',s,re.I)
         if h:
             if current: rows.append(current)
-            current={'cp_index':int(h.group(1)),'start_line':ln}; sig=re.search(r'\(\s*3\s*,\s*([+-]?\d+)\s*\)',s)
+            current={'cp_index':int(h.group(1)),'start_line':ln,'connected_atom_i':'','connected_atom_j':'','connected_atom_i_element':'','connected_atom_j_element':''}; sig=re.search(r'\(\s*3\s*,\s*([+-]?\d+)\s*\)',s)
             if sig: current.update({'signature':f'(3,{sig.group(1)})','cp_type':cp_name(sig.group(1))})
             continue
+        if current:
+            connected=re.search(r'Connected atoms:\s*(\d+)\s*\(\s*([A-Za-z]+)\s*--\s*(\d+)\s*\(\s*([A-Za-z]+)',s)
+            if connected:
+                current.update({
+                    'connected_atom_i':int(connected.group(1)),
+                    'connected_atom_i_element':connected.group(2),
+                    'connected_atom_j':int(connected.group(3)),
+                    'connected_atom_j_element':connected.group(4),
+                })
+                continue
         if current and (':' in s or '=' in s):
             label=re.split(r'[:=]',s,maxsplit=1)[0].strip().lower(); vals=numbers(re.split(r'[:=]',s,maxsplit=1)[1])
             if vals:
@@ -55,7 +65,9 @@ def parse_paths(path):
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument('--repo',type=Path); args=ap.parse_args(); repo=repo_root(args.repo); cps=[]; props=[]; paths=[]
     for system,cfg in SYSTEMS.items():
-        folder=repo/cfg['root']/ 'qtaim'; cp=glob_one(folder,'*_CPs.txt'); prop=glob_one(folder,'*_CPprop.txt'); path=glob_one(folder,'*_paths.txt')
+        folder=repo/cfg['root']/ 'ground_state' / 'qtaim'
+        if not folder.is_dir(): folder=repo/cfg['root']/ 'qtaim'
+        cp=glob_one(folder,'*_CPs.txt'); prop=glob_one(folder,'*_CPprop.txt'); path=glob_one(folder,'*_paths.txt')
         for r in parse_cps(cp): cps.append({'system':system,'source_file':str(cp.relative_to(repo)),**r})
         for r in parse_props(prop): props.append({'system':system,'source_file':str(prop.relative_to(repo)),**r})
         for r in parse_paths(path): paths.append({'system':system,'source_file':str(path.relative_to(repo)),**r})
