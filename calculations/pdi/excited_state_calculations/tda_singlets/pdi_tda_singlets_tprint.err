@@ -1,0 +1,13 @@
+--------------------------------------------------------------------------
+A system call failed during shared memory initialization that should
+not have.  It is likely that your MPI job will now either abort or
+experience performance degradation.
+
+  Local host:  Angzes-MacBook-Pro.local
+  System call: unlink(2) /var/folders/n1/bmzcbfxs2fgc29_x3l4x_s_m0000gn/T//ompi.Angzes-MacBook-Pro.501/pid.92182/1/vader_segment.Angzes-MacBook-Pro.501.f30001.0
+  Error:       No such file or directory (errno 2)
+--------------------------------------------------------------------------
+real 1471.97
+user 2777.35
+sys 116.13
+ORCA exit code for pdi_tda_singlets_tprint: 0

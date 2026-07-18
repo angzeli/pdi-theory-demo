@@ -1,0 +1,16 @@
+! wB97X-D3 6-31+G(d,p) TightSCF RIJCOSX SMD(Water)
+
+%pal
+  nprocs 2
+end
+
+%maxcore 1200
+
+%tddft
+  tda true
+  nroots 15
+  triplets true
+  TPrint 1e-8
+end
+
+* xyzfile 0 1 pdi_opt.xyz
