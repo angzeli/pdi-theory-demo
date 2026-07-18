@@ -1,0 +1,14 @@
+{
+  "method": "Multiwfn NTO export from ORCA TPrint 1e-8 TDA outputs",
+  "output_directory": "results/excited_state/nto_multiwfn",
+  "number_of_states": 6,
+  "number_of_pair_rows": 60,
+  "files": {
+    "nto_parse_summary": "nto_parse_summary.csv",
+    "nto_state_summary": "nto_state_summary.csv",
+    "nto_pairs": "nto_pairs.csv",
+    "nto_pairs_raw": "nto_pairs_raw.csv",
+    "nto_cube_manifest_main": "nto_cube_manifest_main.csv",
+    "nto_cube_manifest_si": "nto_cube_manifest_si.csv"
+  }
+}

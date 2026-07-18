@@ -1,0 +1,7 @@
+source_output,inferred_system,system_label,dedicated_multiplicity,normal_termination,number_of_singlet_states_parsed,number_of_triplet_states_parsed,number_of_nto_blocks_parsed,number_of_matched_nto_blocks,missing_nto_files,energy_mismatches,duplicate_conflict_status,warnings
+calculations/pdi/multiwfn_analysis/excited_state/nto/s1/pdi_S1_nto.session.log,pdi,Parent PDI,singlet,True,30,0,1,1,0,0,unique,
+calculations/pdi/multiwfn_analysis/excited_state/nto/t1/pdi_T1_nto.session.log,pdi,Parent PDI,triplet,True,0,15,1,1,0,0,unique,
+calculations/pdi/multiwfn_analysis/excited_state/nto/t2/pdi_T2_nto.session.log,pdi,Parent PDI,triplet,True,0,15,1,1,0,0,unique,
+calculations/pdi_terminal_functionalized/multiwfn_analysis/excited_state/nto/s1/pdi_terminal_functionalized_S1_nto.session.log,pdi_terminal_functionalized,Terminal-functionalized PDI,singlet,True,30,0,1,1,0,0,unique,
+calculations/pdi_terminal_functionalized/multiwfn_analysis/excited_state/nto/t1/pdi_terminal_functionalized_T1_nto.session.log,pdi_terminal_functionalized,Terminal-functionalized PDI,triplet,True,0,15,1,1,0,0,unique,
+calculations/pdi_terminal_functionalized/multiwfn_analysis/excited_state/nto/t2/pdi_terminal_functionalized_T2_nto.session.log,pdi_terminal_functionalized,Terminal-functionalized PDI,triplet,True,0,15,1,1,0,0,unique,
