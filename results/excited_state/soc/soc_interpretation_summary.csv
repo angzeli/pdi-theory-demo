@@ -1,0 +1,3 @@
+system,system_label,S1-T1 SOC / cm^-1,S1-T2 SOC / cm^-1,strongest S1-Tn channel,strongest S1-Tn SOC / cm^-1
+pdi,Parent PDI,0.09,0.014,S1-T9,10.63
+pdi_terminal_functionalized,Functionalized PDI,0.052,0.05,S1-T10,10.58

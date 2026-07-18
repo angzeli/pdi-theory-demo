@@ -1,0 +1,21 @@
+system,system_label,singlet_label,triplet_label,pair_label,soc_cm1
+pdi,Parent PDI,S1,T1,S1-T1,0.09
+pdi,Parent PDI,S1,T2,S1-T2,0.014142
+pdi,Parent PDI,S1,T3,S1-T3,0.01
+pdi,Parent PDI,S1,T4,S1-T4,0.0
+pdi,Parent PDI,S1,T5,S1-T5,0.078102
+pdi,Parent PDI,S1,T6,S1-T6,0.071414
+pdi,Parent PDI,S1,T7,S1-T7,0.028284
+pdi,Parent PDI,S1,T8,S1-T8,0.072801
+pdi,Parent PDI,S1,T9,S1-T9,10.630489
+pdi,Parent PDI,S1,T10,S1-T10,0.022361
+pdi_terminal_functionalized,Functionalized PDI,S1,T1,S1-T1,0.051962
+pdi_terminal_functionalized,Functionalized PDI,S1,T2,S1-T2,0.05
+pdi_terminal_functionalized,Functionalized PDI,S1,T3,S1-T3,0.0
+pdi_terminal_functionalized,Functionalized PDI,S1,T4,S1-T4,0.04
+pdi_terminal_functionalized,Functionalized PDI,S1,T5,S1-T5,0.072111
+pdi_terminal_functionalized,Functionalized PDI,S1,T6,S1-T6,0.104881
+pdi_terminal_functionalized,Functionalized PDI,S1,T7,S1-T7,0.115758
+pdi_terminal_functionalized,Functionalized PDI,S1,T8,S1-T8,0.130384
+pdi_terminal_functionalized,Functionalized PDI,S1,T9,S1-T9,0.081854
+pdi_terminal_functionalized,Functionalized PDI,S1,T10,S1-T10,10.579764

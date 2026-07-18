@@ -1,0 +1,5 @@
+system,system_label,multiplicity,multiplicity_label,source_output_path,normal_termination,requested_or_detected_number_of_roots,parsed_number_of_states,minimum_excitation_energy_ev,maximum_excitation_energy_ev,number_of_states_with_oscillator_strengths,parser_warnings
+pdi,Parent PDI,singlet,Singlet,calculations/pdi/excited_state_calculations/tda_singlets/pdi_tda_singlets_tprint.out,True,30,30,2.763476,6.632669,30,
+pdi,Parent PDI,triplet,Triplet,calculations/pdi/excited_state_calculations/tda_triplets/pdi_tda_triplets_tprint.out,True,15,15,1.617,4.702,0,
+pdi_terminal_functionalized,Terminal-functionalized PDI,singlet,Singlet,calculations/pdi_terminal_functionalized/excited_state_calculations/tda_singlets/pdi_terminal_functionalized_tda_singlets_tprint.out,True,30,30,2.748061,6.567075,30,
+pdi_terminal_functionalized,Terminal-functionalized PDI,triplet,Triplet,calculations/pdi_terminal_functionalized/excited_state_calculations/tda_triplets/pdi_terminal_functionalized_tda_triplets_tprint.out,True,15,15,1.605,4.543,0,

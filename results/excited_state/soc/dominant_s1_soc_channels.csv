@@ -1,0 +1,11 @@
+system,system_label,pair_label,soc_cm1,x_re,x_im,y_re,y_im,z_re,z_im
+pdi,Parent PDI,S1-T6,0.0714142842854285,0.0,-0.01,0.0,0.07,-0.0,0.01
+pdi,Parent PDI,S1-T8,0.0728010988928051,0.0,-0.0,0.0,0.07,-0.0,0.02
+pdi,Parent PDI,S1-T5,0.0781024967590665,0.0,0.05,0.0,-0.06,-0.0,-0.0
+pdi,Parent PDI,S1-T1,0.09,0.0,-0.0,0.0,-0.0,-0.0,0.09
+pdi,Parent PDI,S1-T9,10.630489170306324,0.0,0.1,0.0,0.02,-0.0,-10.63
+pdi_terminal_functionalized,Functionalized PDI,S1-T9,0.0818535277187245,0.0,-0.07,0.0,-0.03,-0.0,0.03
+pdi_terminal_functionalized,Functionalized PDI,S1-T6,0.1048808848170151,0.0,-0.01,0.0,-0.03,-0.0,0.1
+pdi_terminal_functionalized,Functionalized PDI,S1-T7,0.1157583690279022,0.0,0.03,0.0,-0.02,-0.0,-0.11
+pdi_terminal_functionalized,Functionalized PDI,S1-T8,0.130384048104053,0.0,0.0,0.0,-0.01,-0.0,-0.13
+pdi_terminal_functionalized,Functionalized PDI,S1-T10,10.579763702465192,0.0,0.01,0.0,1.52,-0.0,-10.47
