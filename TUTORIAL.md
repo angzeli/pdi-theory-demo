@@ -110,14 +110,14 @@ The charge and multiplicity must be changed for ions, radicals, triplet oxygen, 
 Use the validated ORCA launcher rather than invoking the ORCA binary directly:
 
 ```bash
-$HOME/bin/orca611 pdi_tda_singlets.inp > pdi_opt.out 2> pdi_opt.err
+$HOME/bin/orca611 pdi_soc.inp > pdi_opt.out 2> pdi_opt.err
 ```
 
 To prevent macOS from sleeping during a long job:
 
 ```bash
 caffeinate -i $HOME/bin/orca611 \
-  pdi_tda_singlets.inp > pdi_opt.out 2> pdi_opt.err
+  pdi_soc.inp > pdi_opt.out 2> pdi_opt.err
 ```
 
 Monitor the output in another Terminal window:
@@ -2314,3 +2314,627 @@ The electronic structure analysis stage is complete when:
 4. QTAIM matched BCP comparisons use connected-atom matching rather than critical-point order alone;
 5. ELF/LOL statistics are reported from the actual cube grids rather than only from rendered images;
 6. DOS comparisons include both system-specific TDOS/PDOS figures and the HOMO-aligned per-atom TDOS comparison.
+
+---
+
+## 7. Excited-state analysis
+
+**Software:** ORCA, Multiwfn, Python/Jupyter
+
+This section documents the validated excited-state workflow for parent PDI and terminal-functionalized PDI. It covers TDA singlet/triplet calculations, UV-Vis parsing, S1/T1/T2 identification, Multiwfn natural-transition-orbital analysis, Multiwfn hole-electron analysis, and ORCA spin-orbit-coupling analysis.
+
+The validated workflow uses the `_tprint` ORCA outputs because they print excitation coefficients down to `TPrint 1e-8`, which is needed for robust Multiwfn excited-state analysis.
+
+### 7.0 One-time Terminal setup
+
+Start every excited-state session from the repository root and define the program paths once:
+
+```bash
+cd "/Users/liangze/Desktop/Tsinghua 2026 Summer/pdi_h2o2_production/pdi-theory-demo"
+
+export REPO="$PWD"
+export ORCA="$HOME/bin/orca611"
+export ORCA_2MKL="/Applications/Academic/orca_6_1_1/orca_2mkl"
+export MWFN="$(command -v Multiwfn 2>/dev/null || command -v multiwfn 2>/dev/null)"
+```
+
+Check that the executable paths resolve before running calculations:
+
+```bash
+echo "$ORCA"
+echo "$ORCA_2MKL"
+echo "$MWFN"
+```
+
+If `MWFN` is empty, add Multiwfn to `PATH` in the current Terminal session or call the full Multiwfn executable path directly.
+
+Define the validated excited-state folders:
+
+```bash
+export PDI_TDA_SINGLET="$REPO/calculations/pdi/excited_state_calculations/tda_singlets"
+export PDI_TDA_TRIPLET="$REPO/calculations/pdi/excited_state_calculations/tda_triplets"
+export FPDI_TDA_SINGLET="$REPO/calculations/pdi_terminal_functionalized/excited_state_calculations/tda_singlets"
+export FPDI_TDA_TRIPLET="$REPO/calculations/pdi_terminal_functionalized/excited_state_calculations/tda_triplets"
+
+export PDI_NTO="$REPO/calculations/pdi/multiwfn_analysis/excited_state/nto"
+export FPDI_NTO="$REPO/calculations/pdi_terminal_functionalized/multiwfn_analysis/excited_state/nto"
+
+export PDI_HEA="$REPO/calculations/pdi/multiwfn_analysis/excited_state/hea"
+export FPDI_HEA="$REPO/calculations/pdi_terminal_functionalized/multiwfn_analysis/excited_state/hea"
+```
+
+### 7.1 Excited-state electronic structure
+
+The validated TDA calculations are:
+
+```text
+calculations/pdi/excited_state_calculations/tda_singlets/pdi_tda_singlets_tprint.inp
+calculations/pdi/excited_state_calculations/tda_triplets/pdi_tda_triplets_tprint.inp
+calculations/pdi_terminal_functionalized/excited_state_calculations/tda_singlets/pdi_terminal_functionalized_tda_singlets_tprint.inp
+calculations/pdi_terminal_functionalized/excited_state_calculations/tda_triplets/pdi_terminal_functionalized_tda_triplets_tprint.inp
+```
+
+The shared validated method line is:
+
+```text
+! wB97X-D3 6-31+G(d,p) TightSCF RIJCOSX SMD(Water)
+```
+
+The singlet TDA block is:
+
+```text
+%tddft
+  tda true
+  nroots 30
+  triplets false
+  TPrint 1e-8
+end
+```
+
+The triplet TDA block is:
+
+```text
+%tddft
+  tda true
+  nroots 15
+  triplets true
+  TPrint 1e-8
+end
+```
+
+The validated resource settings were `%pal nprocs 2` for parent PDI and `%pal nprocs 3` for terminal-functionalized PDI, with `%maxcore 1200`. These settings are conservative enough to run several excited-state jobs in parallel on the validated Apple Silicon laptop.
+
+Run each calculation from its own folder:
+
+```bash
+cd "$PDI_TDA_SINGLET"
+"$ORCA" pdi_tda_singlets_tprint.inp > pdi_tda_singlets_tprint.out 2> pdi_tda_singlets_tprint.err
+grep "ORCA TERMINATED NORMALLY" pdi_tda_singlets_tprint.out
+"$ORCA_2MKL" pdi_tda_singlets_tprint -molden
+
+cd "$PDI_TDA_TRIPLET"
+"$ORCA" pdi_tda_triplets_tprint.inp > pdi_tda_triplets_tprint.out 2> pdi_tda_triplets_tprint.err
+grep "ORCA TERMINATED NORMALLY" pdi_tda_triplets_tprint.out
+"$ORCA_2MKL" pdi_tda_triplets_tprint -molden
+
+cd "$FPDI_TDA_SINGLET"
+"$ORCA" pdi_terminal_functionalized_tda_singlets_tprint.inp > pdi_terminal_functionalized_tda_singlets_tprint.out 2> pdi_terminal_functionalized_tda_singlets_tprint.err
+grep "ORCA TERMINATED NORMALLY" pdi_terminal_functionalized_tda_singlets_tprint.out
+"$ORCA_2MKL" pdi_terminal_functionalized_tda_singlets_tprint -molden
+
+cd "$FPDI_TDA_TRIPLET"
+"$ORCA" pdi_terminal_functionalized_tda_triplets_tprint.inp > pdi_terminal_functionalized_tda_triplets_tprint.out 2> pdi_terminal_functionalized_tda_triplets_tprint.err
+grep "ORCA TERMINATED NORMALLY" pdi_terminal_functionalized_tda_triplets_tprint.out
+"$ORCA_2MKL" pdi_terminal_functionalized_tda_triplets_tprint -molden
+```
+
+The parser reads the validated `_tprint.out` files and writes excited-state tables under `results/excited_state/tda_uv_vis/`:
+
+```bash
+cd "$REPO"
+
+python -m scripts.postprocess.excited_states.parse_tda_calculations \
+  --repo "$REPO" \
+  --minimum-transition-weight 0.05
+```
+
+The key parsed output files are:
+
+```text
+results/excited_state/tda_uv_vis/excitation_states.csv
+results/excited_state/tda_uv_vis/excitation_state_summary.csv
+results/excited_state/tda_uv_vis/selected_excited_states.csv
+results/excited_state/tda_uv_vis/tda_parse_summary.csv
+results/excited_state/tda_uv_vis/uv_vis_interpretation_summary.csv
+results/excited_state/tda_uv_vis/uv_vis_key_states.csv
+```
+
+The validated S1/T1/T2 assignments are:
+
+| System | S1 | T1 | T2 |
+|---|---:|---:|---:|
+| Parent PDI | 2.763 eV | 1.617 eV | 2.949 eV |
+| Terminal-functionalized PDI | 2.748 eV | 1.605 eV | 2.935 eV |
+
+The main UV-Vis interpretation comes from S1 because it is the first bright singlet state in both molecules. T1 and T2 are the low-lying triplet states used for NTO, HEA and SOC comparisons.
+
+### 7.2 Natural transition orbital analysis (Multiwfn)
+
+NTO analysis is performed with Multiwfn under:
+
+```text
+calculations/pdi/multiwfn_analysis/excited_state/nto/
+calculations/pdi_terminal_functionalized/multiwfn_analysis/excited_state/nto/
+```
+
+Use the `_tprint.out` files, not the older non-`_tprint` outputs. The lower `TPrint` threshold gives Multiwfn enough transition-coefficient information for the NTO decomposition.
+
+For singlet S1, enter this Multiwfn sequence:
+
+```text
+18
+6
+/path/to/*_tda_singlets_tprint.out
+1
+3
+output_S1_nto.mwfn
+0
+0
+q
+```
+
+For triplet T1, enter:
+
+```text
+18
+6
+/path/to/*_tda_triplets_tprint.out
+3
+1
+3
+output_T1_nto.mwfn
+0
+0
+q
+```
+
+For triplet T2, enter:
+
+```text
+18
+6
+/path/to/*_tda_triplets_tprint.out
+3
+2
+3
+output_T2_nto.mwfn
+0
+0
+q
+```
+
+A complete set of commands is:
+
+```bash
+mkdir -p "$PDI_NTO/s1" "$PDI_NTO/t1" "$PDI_NTO/t2"
+mkdir -p "$FPDI_NTO/s1" "$FPDI_NTO/t1" "$FPDI_NTO/t2"
+
+cd "$PDI_NTO/s1"
+"$MWFN" "$PDI_TDA_SINGLET/pdi_tda_singlets_tprint.molden.input"
+
+cd "$PDI_NTO/t1"
+"$MWFN" "$PDI_TDA_TRIPLET/pdi_tda_triplets_tprint.molden.input"
+
+cd "$PDI_NTO/t2"
+"$MWFN" "$PDI_TDA_TRIPLET/pdi_tda_triplets_tprint.molden.input"
+
+cd "$FPDI_NTO/s1"
+"$MWFN" "$FPDI_TDA_SINGLET/pdi_terminal_functionalized_tda_singlets_tprint.molden.input"
+
+cd "$FPDI_NTO/t1"
+"$MWFN" "$FPDI_TDA_TRIPLET/pdi_terminal_functionalized_tda_triplets_tprint.molden.input"
+
+cd "$FPDI_NTO/t2"
+"$MWFN" "$FPDI_TDA_TRIPLET/pdi_terminal_functionalized_tda_triplets_tprint.molden.input"
+```
+
+When Multiwfn asks for the ORCA output path, use the absolute path to the matching `_tprint.out` file. Example for parent PDI S1:
+
+```text
+/Users/liangze/Desktop/Tsinghua 2026 Summer/pdi_h2o2_production/pdi-theory-demo/calculations/pdi/excited_state_calculations/tda_singlets/pdi_tda_singlets_tprint.out
+```
+
+After each `.mwfn` file is generated, export the NTO hole and electron cubes from that `.mwfn` file. Use `100 100 100` as the grid resolution. The `150 150 150` grid generated cube files that were too large for practical VMD rendering on the validated laptop.
+
+For each NTO orbital index, enter:
+
+```text
+5
+4
+ORBITAL_INDEX
+4
+100 100 100
+2
+0
+q
+```
+
+Multiwfn writes the cube as:
+
+```text
+MOvalue.cub
+```
+
+Rename it immediately before exporting the next orbital:
+
+```bash
+mv MOvalue.cub pdi_T2_nto_pair2_electron.cub
+```
+
+Use this validated NTO cube index table:
+
+| System | State | Pair | Hole index | Electron index |
+|---|---|---:|---:|---:|
+| Parent PDI | S1 | 1 | 100 | 101 |
+| Parent PDI | T1 | 1 | 100 | 101 |
+| Parent PDI | T2 | 1 | 100 | 101 |
+| Parent PDI | T2 | 2 | 99 | 102 |
+| Functionalized PDI | S1 | 1 | 140 | 141 |
+| Functionalized PDI | T1 | 1 | 140 | 141 |
+| Functionalized PDI | T2 | 1 | 140 | 141 |
+| Functionalized PDI | T2 | 2 | 139 | 142 |
+
+The validated leading NTO weights are:
+
+| System | State | Pair 1 weight | Pair 2 weight | Main rendering |
+|---|---|---:|---:|---|
+| Parent PDI | S1 | 0.95548 | - | Pair 1 |
+| Parent PDI | T1 | 0.90821 | - | Pair 1 |
+| Parent PDI | T2 | 0.49697 | 0.43201 | Pairs 1 and 2 |
+| Terminal-functionalized PDI | S1 | 0.95515 | - | Pair 1 |
+| Terminal-functionalized PDI | T1 | 0.90868 | - | Pair 1 |
+| Terminal-functionalized PDI | T2 | 0.49176 | 0.43827 | Pairs 1 and 2 |
+
+The practical rendering rule used here is:
+
+- if pair 1 weight is at least `0.90`, render pair 1 only;
+- if pair 1 is between `0.75` and `0.90`, add pairs until cumulative weight is at least `0.90`;
+- if a secondary pair is at least `0.10`, render it;
+- if a secondary pair is between `0.05` and `0.10`, report it numerically or render it in supporting information when spatially distinctive;
+- if a secondary pair is below `0.05`, usually report it numerically but do not render it.
+
+After cube generation, parse the NTO analysis:
+
+```bash
+cd "$REPO"
+
+python -m scripts.postprocess.excited_states.parse_nto_calculations \
+  --project-root "$REPO" \
+  --calculation-root calculations \
+  --output-dir results/excited_state/nto_multiwfn \
+  --main-cutoff 0.90 \
+  --si-cutoff 0.95 \
+  --strict
+```
+
+The main parsed outputs are:
+
+```text
+results/excited_state/nto_multiwfn/nto_cube_manifest_main.csv
+results/excited_state/nto_multiwfn/nto_cube_manifest_si.csv
+results/excited_state/nto_multiwfn/nto_pairs.csv
+results/excited_state/nto_multiwfn/nto_state_summary.csv
+results/excited_state/nto_multiwfn/nto_summary.json
+```
+
+### 7.3 Hole-electron analysis (HEA)
+
+HEA is also performed in Multiwfn and is stored under:
+
+```text
+calculations/pdi/multiwfn_analysis/excited_state/hea/
+calculations/pdi_terminal_functionalized/multiwfn_analysis/excited_state/hea/
+```
+
+Use excitation analysis option `1`, not NTO option `6`.
+
+For singlet S1, enter:
+
+```text
+18
+1
+/path/to/*_tda_singlets_tprint.out
+1
+2
+10
+1
+11
+1
+0
+0
+q
+```
+
+For triplet T1 or T2, enter:
+
+```text
+18
+1
+/path/to/*_tda_triplets_tprint.out
+3
+STATE_INDEX
+1
+2
+10
+1
+11
+1
+0
+0
+q
+```
+
+Use:
+
+```text
+STATE_INDEX = 1 for T1
+STATE_INDEX = 2 for T2
+```
+
+A complete set of folders and launch commands is:
+
+```bash
+mkdir -p "$PDI_HEA/s1" "$PDI_HEA/t1" "$PDI_HEA/t2"
+mkdir -p "$FPDI_HEA/s1" "$FPDI_HEA/t1" "$FPDI_HEA/t2"
+
+cd "$PDI_HEA/s1"
+"$MWFN" "$PDI_TDA_SINGLET/pdi_tda_singlets_tprint.molden.input"
+
+cd "$PDI_HEA/t1"
+"$MWFN" "$PDI_TDA_TRIPLET/pdi_tda_triplets_tprint.molden.input"
+
+cd "$PDI_HEA/t2"
+"$MWFN" "$PDI_TDA_TRIPLET/pdi_tda_triplets_tprint.molden.input"
+
+cd "$FPDI_HEA/s1"
+"$MWFN" "$FPDI_TDA_SINGLET/pdi_terminal_functionalized_tda_singlets_tprint.molden.input"
+
+cd "$FPDI_HEA/t1"
+"$MWFN" "$FPDI_TDA_TRIPLET/pdi_terminal_functionalized_tda_triplets_tprint.molden.input"
+
+cd "$FPDI_HEA/t2"
+"$MWFN" "$FPDI_TDA_TRIPLET/pdi_terminal_functionalized_tda_triplets_tprint.molden.input"
+```
+
+Multiwfn writes:
+
+```text
+hole.cub
+electron.cub
+```
+
+Rename these immediately after each state. Examples:
+
+```bash
+mv hole.cub pdi_T1_hole.cub
+mv electron.cub pdi_T1_electron.cub
+```
+
+For terminal-functionalized PDI, use the full system prefix:
+
+```bash
+mv hole.cub pdi_terminal_functionalized_T1_hole.cub
+mv electron.cub pdi_terminal_functionalized_T1_electron.cub
+```
+
+If Multiwfn reports that configurations with absolute coefficient below `0.01000` are ignored, that is the normal excitation-analysis coefficient threshold and not an error. The `_tprint` ORCA files are still required because they preserve enough small transition terms for reproducible postprocessing.
+
+### 7.4 Spin-orbit coupling analysis
+
+SOC calculations are run directly in ORCA from:
+
+```text
+calculations/pdi/excited_state_calculations/soc/pdi_soc.inp
+calculations/pdi_terminal_functionalized/excited_state_calculations/soc/pdi_terminal_functionalized_soc.inp
+```
+
+The validated SOC input core is:
+
+```text
+%tddft
+    TDA true
+    NRoots 10
+    DoSOC true
+    TPrint 1e-8
+end
+```
+
+Run and check parent PDI:
+
+```bash
+cd "$REPO/calculations/pdi/excited_state_calculations/soc"
+"$ORCA" pdi_soc.inp > pdi_soc.out 2> pdi_soc.err
+grep "ORCA TERMINATED NORMALLY" pdi_soc.out
+```
+
+Run and check terminal-functionalized PDI:
+
+```bash
+cd "$REPO/calculations/pdi_terminal_functionalized/excited_state_calculations/soc"
+"$ORCA" pdi_terminal_functionalized_soc.inp > pdi_terminal_functionalized_soc.out 2> pdi_terminal_functionalized_soc.err
+grep "ORCA TERMINATED NORMALLY" pdi_terminal_functionalized_soc.out
+```
+
+Parse the SOC outputs from the repository root. Do not leave trailing spaces after the backslashes:
+
+```bash
+cd "$REPO"
+
+python scripts/postprocess/excited_states/parse_soc.py \
+  calculations/pdi/excited_state_calculations/soc/pdi_soc.out \
+  --singlet 1 \
+  --csv results/excited_state/soc/pdi_soc.csv
+
+python scripts/postprocess/excited_states/parse_soc.py \
+  calculations/pdi_terminal_functionalized/excited_state_calculations/soc/pdi_terminal_functionalized_soc.out \
+  --singlet 1 \
+  --csv results/excited_state/soc/pdi_terminal_functionalized_soc.csv
+```
+
+The validated SOC analysis focuses on:
+
+- SOC matrix heatmaps;
+- S1-triplet SOC bar charts;
+- S1-triplet SOC versus energy-gap screening;
+- the screening descriptor `SOC^2 / DeltaE^2`.
+
+The validated low-lying S1-triplet SOC values are small:
+
+| System | S1-T1 SOC | S1-T2 SOC | Strongest S1-Tn channel |
+|---|---:|---:|---|
+| Parent PDI | 0.090 cm^-1 | 0.014 cm^-1 | S1-T9, 10.63 cm^-1 |
+| Terminal-functionalized PDI | 0.052 cm^-1 | 0.050 cm^-1 | S1-T10, 10.58 cm^-1 |
+
+### 7.5 Excited-state notebooks and figures
+
+The validated excited-state notebooks are:
+
+```text
+analysis/08_excitation_state_uv_vis_analysis.ipynb
+analysis/09_natural_transition_orbital_analysis.ipynb
+analysis/10_spin_orbit_coupling_analysis.ipynb
+```
+
+Optional notebook execution commands:
+
+```bash
+cd "$REPO"
+
+jupyter nbconvert --to notebook --execute \
+  analysis/08_excitation_state_uv_vis_analysis.ipynb \
+  --output /tmp/08_excited_state_uv_vis.executed.ipynb \
+  --ExecutePreprocessor.timeout=600
+
+jupyter nbconvert --to notebook --execute \
+  analysis/09_natural_transition_orbital_analysis.ipynb \
+  --output /tmp/09_nto.executed.ipynb \
+  --ExecutePreprocessor.timeout=600
+
+jupyter nbconvert --to notebook --execute \
+  analysis/10_spin_orbit_coupling_analysis.ipynb \
+  --output /tmp/10_soc.executed.ipynb \
+  --ExecutePreprocessor.timeout=600
+```
+
+The generated figure folders are:
+
+```text
+figures/excited_state_uv_vis/
+figures/nto/
+figures/hea/
+figures/soc/
+```
+
+The validated UV-Vis and excited-state figures include:
+
+```text
+figures/excited_state_uv_vis/simulated_uv_vis_comparison_normalized.pdf
+figures/excited_state_uv_vis/pdi_singlet_triplet_energy_levels.pdf
+figures/excited_state_uv_vis/pdi_terminal_functionalized_singlet_triplet_energy_levels.pdf
+```
+
+The validated NTO and HEA figures include:
+
+```text
+figures/nto/pdi/pdi_nto_combined_figure.tiff
+figures/nto/pdi_terminal_functionalized/pdi_terminal_functionalized_nto_combined_figure.tiff
+figures/hea/hea_combined_figure.tiff
+```
+
+The validated SOC figures include:
+
+```text
+figures/soc/pdi_soc_matrix_heatmap.pdf
+figures/soc/pdi_terminal_functionalized_soc_matrix_heatmap.pdf
+figures/soc/s1_triplet_soc_comparison.pdf
+figures/soc/s1_triplet_soc_vs_energy_gap.pdf
+figures/soc/dominant_s1_soc_channels.pdf
+```
+
+Do not describe a SOC-arrow energy-level figure as a validated output unless it is generated and added later.
+
+### 7.6 Expected output structure
+
+After the excited-state workflow is complete, the relevant output tree should include:
+
+```text
+calculations/
+├── pdi/
+│   ├── excited_state_calculations/
+│   │   ├── tda_singlets/
+│   │   ├── tda_triplets/
+│   │   └── soc/
+│   └── multiwfn_analysis/
+│       └── excited_state/
+│           ├── hea/
+│           │   ├── s1/
+│           │   ├── t1/
+│           │   └── t2/
+│           └── nto/
+│               ├── s1/
+│               ├── t1/
+│               └── t2/
+└── pdi_terminal_functionalized/
+    ├── excited_state_calculations/
+    │   ├── tda_singlets/
+    │   ├── tda_triplets/
+    │   └── soc/
+    └── multiwfn_analysis/
+        └── excited_state/
+            ├── hea/
+            │   ├── s1/
+            │   ├── t1/
+            │   └── t2/
+            └── nto/
+                ├── s1/
+                ├── t1/
+                └── t2/
+
+results/
+└── excited_state/
+    ├── nto_multiwfn/
+    ├── soc/
+    └── tda_uv_vis/
+
+figures/
+├── excited_state_uv_vis/
+├── hea/
+├── nto/
+└── soc/
+```
+
+The key analysis-ready CSV files are:
+
+```text
+results/excited_state/tda_uv_vis/selected_excited_states.csv
+results/excited_state/tda_uv_vis/excitation_state_summary.csv
+results/excited_state/nto_multiwfn/nto_state_summary.csv
+results/excited_state/nto_multiwfn/nto_cube_manifest_main.csv
+results/excited_state/soc/s1_triplet_soc_summary.csv
+results/excited_state/soc/s1_triplet_soc_energy_gap_screening.csv
+```
+
+### 7.7 Completion criteria
+
+The excited-state analysis stage is complete when:
+
+1. all four `_tprint` TDA calculations terminate normally;
+2. all four `_tprint` calculations have corresponding `.molden.input` files from `orca_2mkl`;
+3. `parse_tda_calculations.py` completes and writes `results/excited_state/tda_uv_vis/selected_excited_states.csv`;
+4. S1, T1 and T2 are identified for both parent PDI and terminal-functionalized PDI;
+5. Multiwfn NTO `.mwfn` files and cube files are generated for S1, T1 and T2;
+6. T2 includes the two dominant NTO pairs for both molecules;
+7. HEA hole and electron cubes are generated for S1, T1 and T2;
+8. SOC calculations terminate normally and `parse_soc.py` writes both system-level SOC CSV files;
+9. notebooks `08_excitation_state_uv_vis_analysis.ipynb`, `09_natural_transition_orbital_analysis.ipynb` and `10_spin_orbit_coupling_analysis.ipynb` run without errors;
+10. the expected excited-state figure folders are populated under `figures/`.
